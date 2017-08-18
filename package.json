@@ -5,7 +5,7 @@
     "build:dev": "npm run createfirebaseconf; npm run cleanup; webpack -d",
     "build:watch": "npm run createfirebaseconf; npm run cleanup; webpack --watch",
     "createfirebaseconf": "firebase setup:web --json > ./frontend/firebase-config.json",
-    "devserver": "npm run build:watch & GCLOUD_PROJECT=- NODE_ENV=dev firebase serve --only hosting,functions",
+    "serve": "npm run build:watch & GCLOUD_PROJECT=- NODE_ENV=dev firebase serve --only hosting,functions",
     "format": "prettier --write --single-quote --print-width=120 --parser=flow --tab-width=2 \"js/**/*.{js,jsx}\"",
     "lint": "eslint **/*.{js,jsx} --quiet",
     "test": "jest",

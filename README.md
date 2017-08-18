@@ -1,15 +1,19 @@
-# Friendly Pix Web
+# Friendly Pix Web - React edition
 
-Friendly Pix Web is a sample app demonstrating how to build a JavaScript/Web app with the Firebase Platform.
+Friendly Pix Web is a sample app demonstrating how to build a isomorphic React Web app with the Firebase Platform.
 
 Friendly Pix is a place where you can share photos, follow friends, comment on photos...
 
 
 ## Initial setup, build tools and dependencies
 
-Friendly Pix is built using Javascript, [Firebase](https://firebase.google.com/docs/web/setup) and jQuery. The Auth flow is built using [Firebase-UI](https://github.com/firebase/firebaseui-web). Javascript dependencies are managed using [bower](http://bower.io/) and Build/Deploy tools dependencies are managed using [npm](https://www.npmjs.com/). Also Friendly Pix is written in ES2015 so for wide browser support we'll transpile the code to ES5 using [BabelJs](http://babeljs.io). Additionally server-side micro-services are built on [Cloud Functions for Firebase](https://firebase.google.com/docs/functions).
+Friendly Pix is built using Javascript, [Firebase](https://firebase.google.com/docs/web/setup) and [React](https://facebook.github.io/react/). The Auth flow is built using [Firebase-UI](https://github.com/firebase/firebaseui-web).
 
-Install all Build/Deploy tools dependencies by running:
+FriendlyPix is an Isomorphic app, the first render of the app is generated server side using [Cloud Functions for Firebase](https://firebase.google.com/docs/functions).
+
+Additionally server-side micro-services are built on [Cloud Functions for Firebase](https://firebase.google.com/docs/functions) such as an automatic image moderation and notifications sending.
+
+Install all JavaScript/Build/Deploy tools dependencies by running:
 
 ```bash
 $ npm install
@@ -32,13 +36,9 @@ You can start a local development server by running:
 npm run serve
 ```
 
-This will start `firebase serve` and make sure your Javascript files are transpiled automatically to ES5.
+This will start `firebase serve` and make sure your Javascript files are transpiled and packed automatically.
 
-> This is currently broken on Windows. On Windows please run the following commands separately instead: `bower install`, `babel -w scripts -s --retain-lines -d lib` and `firebase serve`.
-
-Then open [http://localhost:5000](http://localhost:5000)
-
-> Note: Cloud Functions cannot yet be ran locally. Deploy the app to deploy and enable the Cloud Functions.
+Then open [http://localhost:5000](http://localhost:5000) in your browser.
 
 
 ## Deploy the app
@@ -49,7 +49,7 @@ Before deploying your code you need to build it for production. Run:
 npm run build
 ```
 
-This will install all runtime dependencies and transpile the Javascript code to ES5 and install Cloud Functions dependencies.
+This will install all runtime dependencies and transpile and pack Javascript code to ES5, install Cloud Functions dependencies.
 Then run:
 
 ```bash
