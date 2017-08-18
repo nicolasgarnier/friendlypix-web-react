@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,40 +21,26 @@ if (!process.env.FUNCTION_NAME || process.env.NODE_ENV === 'dev') {
   require('babel-register');
 }
 
-// /**
-//  * Triggers when a user gets a new follower and sends notifications if the user has enabled them.
-//  * Also avoids sending multiple notifications for the same user by keeping a timestamp of sent notifications.
-//  */
-// if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'sendFollowerNotification') {
-//   exports.sendFollowerNotification = require('./functions/sendFollowerNotification');
-// }
-//
-// /**
-//  * When an image is uploaded we check if it is flagged as Adult or Violence by the Cloud Vision
-//  * API and if it is we blur it using ImageMagick.
-//  */
-// if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'blurOffensiveImages') {
-//   exports.blurOffensiveImages = require('./functions/blurOffensiveImages');
-// }
-//
-// /**
-//  * Helper function to get the markup from React, inject the initial state, and
-//  * send the server-side markup to the client
-//  */
-// if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'renderTemplate') {
-//   exports.renderTemplate = require('./functions/renderTemplate');
-// }
+/**
+ * Triggers when a user gets a new follower and sends notifications if the user has enabled them.
+ * Also avoids sending multiple notifications for the same user by keeping a timestamp of sent notifications.
+ */
+if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'sendFollowerNotification') {
+  exports.sendFollowerNotification = require('./functions/sendFollowerNotification');
+}
 
-const fs = require('fs');
-const path = require('path');
+/**
+ * When an image is uploaded we check if it is flagged as Adult or Violence by the Cloud Vision
+ * API and if it is we blur it using ImageMagick.
+ */
+if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'blurOffensiveImages') {
+  exports.blurOffensiveImages = require('./functions/blurOffensiveImages');
+}
 
-const FUNCTIONS_FOLDER = `.${path.sep}functions`;
-
-fs.readdirSync(FUNCTIONS_FOLDER).forEach(file => {
-  if(file.endsWith('.js')) {
-    const fileBaseName = file.slice(0, -3);
-    if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === fileBaseName) {
-      exports[fileBaseName] = require(`${FUNCTIONS_FOLDER}${path.sep}${fileBaseName}`);
-    }
-  }
-});
+/**
+ * Helper function to get the markup from React, inject the initial state, and
+ * send the server-side markup to the client
+ */
+if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'renderTemplate') {
+  exports.renderTemplate = require('./functions/renderTemplate');
+}
