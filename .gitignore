@@ -1,8 +1,16 @@
 /*.pyc
 /node_modules
 /firebase-debug.log
-/functions/service-account-credentials.json
+/microservices/service-account-credentials.json
 /frontend/firebase-config.json
 /.firebaserc
 /public/bundle.js
 /public/bundle.js.map
+*.map
+frontend/actionCreators.js
+frontend/actions.js
+frontend/asyncActions.js
+frontend/ClientApp.js
+frontend/reducers.js
+frontend/Routes.js
+frontend/ServerApp.js
