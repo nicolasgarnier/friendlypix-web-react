@@ -71,7 +71,7 @@ const config = {
   }
 };
 
-console.log('Packing for', process.env.NODE_ENV);
+console.log('Packing for', process.env.NODE_ENV || 'dev');
 
 if (process.env.NODE_ENV === 'prod') {
   config.devtool = 'source-map';
