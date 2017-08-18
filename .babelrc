@@ -1,0 +1,30 @@
+{
+  "presets": [
+    "react",
+    ["env", {
+      "targets": {
+        "browsers": "last 2 versions"
+      },
+      "loose": true,
+      "modules": "commonjs"
+    }]
+  ],
+  "plugins": [
+    "babel-plugin-syntax-dynamic-import",
+    "babel-plugin-dynamic-import-webpack",
+    "babel-plugin-transform-class-properties",
+    "babel-plugin-transform-object-rest-spread"
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    },
+    "server": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    }
+  }
+}
