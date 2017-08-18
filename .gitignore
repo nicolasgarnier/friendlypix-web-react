@@ -1,5 +1,8 @@
-*.pyc
-node_modules
-firebase-debug.log
+/*.pyc
+/node_modules
+/firebase-debug.log
 /functions/service-account-credentials.json
 /frontend/firebase-config.json
+/.firebaserc
+/public/bundle.js
+/public/bundle.js.map
