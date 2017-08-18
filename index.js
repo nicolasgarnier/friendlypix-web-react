@@ -26,7 +26,7 @@ if (!process.env.FUNCTION_NAME || process.env.NODE_ENV === 'dev') {
  * Also avoids sending multiple notifications for the same user by keeping a timestamp of sent notifications.
  */
 if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'sendFollowerNotification') {
-  exports.sendFollowerNotification = require('./functions/sendFollowerNotification');
+  exports.sendFollowerNotification = require('./microservices/sendFollowerNotification');
 }
 
 /**
@@ -34,7 +34,7 @@ if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'sendFollowerNot
  * API and if it is we blur it using ImageMagick.
  */
 if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'blurOffensiveImages') {
-  exports.blurOffensiveImages = require('./functions/blurOffensiveImages');
+  exports.blurOffensiveImages = require('./microservices/blurOffensiveImages');
 }
 
 /**
@@ -42,5 +42,5 @@ if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'blurOffensiveIm
  * send the server-side markup to the client
  */
 if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === 'renderTemplate') {
-  exports.renderTemplate = require('./functions/renderTemplate');
+  exports.renderTemplate = require('./microservices/renderTemplate');
 }
