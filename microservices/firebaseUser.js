@@ -45,9 +45,13 @@ exports.authentifyFirebaseUser = (req, res, next) => {
   getIdTokenFromRequest(req, res).then(idToken => {
     if (idToken) {
       addDecodedIdTokenToRequest(idToken, req).then(() => {
-        addCustomTokenToRequest(req.user.uid, req).then(() => {
+        if (req.user) {
+          addCustomTokenToRequest(req.user.uid, req).then(() => {
+            next();
+          });
+        } else {
           next();
-        });
+        }
       });
     } else {
       next();

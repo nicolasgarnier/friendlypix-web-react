@@ -4,7 +4,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import firebase from 'firebase/app';
 import 'firebase/auth';
-
+import styles from './splash-page.css';
+import '!style-loader!css-loader!firebaseui/dist/firebaseui.css'; // import globally without running through CSS modules
 
 /**
  * Entry point to the FriendlyPix app.
@@ -57,7 +58,7 @@ class SplashPage extends React.Component {
   render() {
     return (
       <div>
-        <h1>Friendly Pix</h1>
+        <h1 className={styles.title}>Friendly Pix</h1>
         <div>
           The friendliest way to share your pics
         </div>

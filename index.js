@@ -17,7 +17,7 @@
 
 // This will allow to require the .jsx files directly since babel will automatically compile them on the fly.
 // We only using during development for performance reasons.
-if (!process.env.FUNCTION_NAME || process.env.NODE_ENV === 'dev') {
+if (!process.env.FUNCTION_NAME || process.env.NODE_ENV === 'devserver') {
   require('babel-register');
 }
 

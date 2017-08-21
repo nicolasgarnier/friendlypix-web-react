@@ -5,7 +5,6 @@
 /frontend/firebase-config.json
 /.firebaserc
 /public/bundle.js
-/public/bundle.js.map
 *.map
 frontend/actionCreators.js
 frontend/actions.js
@@ -14,3 +13,4 @@ frontend/ClientApp.js
 frontend/reducers.js
 frontend/Routes.js
 frontend/ServerApp.js
+/public/bundle.css

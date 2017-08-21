@@ -2,29 +2,15 @@
   "presets": [
     "react",
     ["env", {
-      "targets": {
-        "browsers": "last 2 versions"
-      },
+      "targets": { "node": "6.11" },
       "loose": true,
       "modules": "commonjs"
     }]
   ],
   "plugins": [
     "babel-plugin-syntax-dynamic-import",
-    "babel-plugin-dynamic-import-webpack",
     "babel-plugin-transform-class-properties",
-    "babel-plugin-transform-object-rest-spread"
-  ],
-  "env": {
-    "test": {
-      "plugins": [
-        "transform-es2015-modules-commonjs"
-      ]
-    },
-    "server": {
-      "plugins": [
-        "transform-es2015-modules-commonjs"
-      ]
-    }
-  }
+    "babel-plugin-transform-object-rest-spread",
+    ["babel-plugin-css-modules-transform", {"generateScopedName": "[name]__[local]___[hash:base64:5]"}]
+  ]
 }

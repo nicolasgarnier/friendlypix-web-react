@@ -16,6 +16,8 @@
 'use strict';
 
 const path = require('path');
+const WebpackShellPlugin = require('webpack-shell-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const config = {
   context: __dirname,
@@ -38,7 +40,7 @@ const config = {
     reasons: true,
     chunks: true
   },
-  plugins: [],
+  plugins: [new ExtractTextPlugin('./bundle.css')],
   module: {
     rules: [
       {
@@ -51,11 +53,46 @@ const config = {
         test: /\.jsx?$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
-        include: [path.resolve('frontend'), path.resolve('node_modules/preact-compat/src')]
+        include: [path.resolve('frontend'), path.resolve('node_modules/preact-compat/src')],
+        query: {
+          babelrc: false,
+          presets: [
+            "react",
+            ["env", {
+              "targets": {
+                "browsers": "last 2 versions"
+              },
+              "loose": true,
+              "modules": "commonjs"
+            }]
+          ],
+          "plugins": [
+            "babel-plugin-syntax-dynamic-import",
+            "babel-plugin-transform-class-properties",
+            "babel-plugin-transform-object-rest-spread"
+          ]
+        }
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        loader: ExtractTextPlugin.extract(
+          {
+            fallback: 'style-loader',
+            use:[
+              {
+                loader: 'css-loader',
+                options: {
+                  importLoaders: 1,
+                  modules: true,
+                  autoprefixer: false,
+                  localIdentName: '[name]__[local]___[hash:base64:5]'
+                }
+              },
+              {
+                loader: 'postcss-loader'
+              }
+            ]
+          })
       },
       {/* Workaround for issue https://github.com/firebase/firebaseui-web/issues/163 */},
       {
@@ -71,10 +108,17 @@ const config = {
   }
 };
 
-console.log('Packing for', process.env.NODE_ENV || 'dev');
+console.log('Packing for', process.env.NODE_ENV || 'development');
 
-if (process.env.NODE_ENV === 'prod') {
+if (process.env.NODE_ENV === 'production') {
   config.devtool = 'source-map';
+}
+
+if (process.env.NODE_ENV === 'devserver') {
+  config.plugins.push(new WebpackShellPlugin({
+    onBuildStart: ['echo "Starting to pack"'],
+    onBuildEnd: ['firebase serve --only hosting,functions']
+  }));
 }
 
 module.exports = config;
