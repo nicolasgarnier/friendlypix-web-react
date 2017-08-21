@@ -4,6 +4,12 @@ Friendly Pix Web is a sample app demonstrating how to build a isomorphic React W
 
 Friendly Pix is a place where you can share photos, follow friends, comment on photos...
 
+The following React techs are being used:
+ - Isomorphism with `ReactDOMServer` hosted on Cloud Functions
+ - Router v4
+ - CSS Modules
+ - Redux
+
 
 ## Initial setup, build tools and dependencies
 
