@@ -45,12 +45,11 @@ app.get('*', (req, res) => {
 
   if (context.url) {
     res.redirect(context.url);
+    res.end();
+  } else {
+    const initialState = serverApp.store.getState();
+    res.send(template({body, initialState}));
   }
-
-  const initialState = serverApp.store.getState();
-
-  res.write(template({body, initialState}));
-  res.end();
 });
 
 /**

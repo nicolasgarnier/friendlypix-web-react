@@ -3,9 +3,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import firebase from 'firebase/app';
+import { Link } from 'react-router-dom';
 import 'firebase/auth';
 import styles from './splash-page.css';
 import '!style-loader!css-loader!firebaseui/dist/firebaseui.css'; // import globally without running through CSS modules
+import '!style-loader!css-loader!./firebaseui-overrides.css'; // import globally without running through CSS modules
+
 
 /**
  * Entry point to the FriendlyPix app.
@@ -36,8 +39,9 @@ class SplashPage extends React.Component {
 
     // Configure Firebase UI
     const uiConfig = {
-      'signInFlow': 'popup',
-      'signInOptions': [
+      signInSuccessUrl: '/home',
+      signInFlow: 'popup',
+      signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         firebase.auth.FacebookAuthProvider.PROVIDER_ID
       ]
@@ -57,12 +61,13 @@ class SplashPage extends React.Component {
    */
   render() {
     return (
-      <div>
-        <h1 className={styles.title}>Friendly Pix</h1>
-        <div>
-          The friendliest way to share your pics
+      <div className={styles.container}>
+        <div className={styles.logo}><i className={styles.logoIcon + " material-icons"}>photo</i> Friendly Pix</div>
+        <div className={styles.caption}>The friendliest way to share your pics</div>
+          <div>
+          <div className={styles.firebaseui} id="firebaseui-auth-container"/>
+          <Link className={styles.skip} to="/recent">skip sign in</Link>
         </div>
-        <div id="firebaseui-auth-container"/>
       </div>
     )
   }

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import './app.css';
 import canUseDOM from 'exenv';
 
 
@@ -73,7 +74,7 @@ class App extends React.Component {
       <div>
         <h1>TITLE</h1>
         <div>
-          <Link to="/">Splash</Link> - <Link to="/recent">Hello</Link> - <Link to="/home">Home</Link>
+          <Link to="/">Splash</Link> - <Link to="/recent">Recent Posts Feed</Link> - <Link to="/home">Home</Link>
           - <Link to="/user/1">View User 1</Link> - <Link to="/post/1">View Post 1</Link> - <Link to="/about">About</Link>
           - <Link to="/new">Create New</Link>
         </div>
