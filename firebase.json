@@ -7,7 +7,7 @@
   },
   "functions": {
     "source": "./",
-    "exclude": "public"
+    "exclude": ["public", "node_modules"]
   },
   "hosting": {
     "public": "public",

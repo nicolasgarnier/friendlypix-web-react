@@ -3,10 +3,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import { Button } from 'material-ui';
 import './app.css';
-import canUseDOM from 'exenv';
+import { firebaseApp } from '../firebase/firebaseRedux';
 
 
 /**
@@ -22,23 +21,6 @@ class App extends React.Component {
    */
   constructor(props) {
     super(props);
-
-    // Load firebase.
-    try {
-      firebase.initializeApp(require('../firebase-config.json').result);
-    } catch(e) {}
-
-    if (!canUseDOM) {
-      if (props.firebaseCustomAuthToken) {
-        firebase.auth().signInWithCustomToken(props.firebaseCustomAuthToken).then(user => {
-          console.log('USER SIGNED-IN with custom token!', user.uid);
-        });
-      } else {
-        firebase.auth().signOut().then(() => {
-          console.log('USER SIGNED-OUT!');
-        });
-      }
-    }
   }
 
   /**
@@ -50,20 +32,10 @@ class App extends React.Component {
   };
 
   /**
-   * @inheritDoc
+   * Handles click to the logout button.
    */
-  componentDidMount() {
-    // Make sure the Firebase ID Token is always passed as a cookie.
-    firebase.auth().onIdTokenChanged(user => {
-      if (user) {
-        user.getIdToken().then(idToken => {
-          console.log('User signed-in! ID Token:', idToken);
-          document.cookie = '__session=' + idToken + ';max-age=' + (idToken ? 3600 : 0);
-        });
-      } else {
-        document.cookie = '__session=;expires=Thu, 01 Jan 1970 00:00:01 GMT';
-      }
-    });
+  static onLogoutClick() {
+    firebaseApp.auth().signOut();
   }
 
   /**
@@ -77,6 +49,7 @@ class App extends React.Component {
           <Link to="/">Splash</Link> - <Link to="/recent">Recent Posts Feed</Link> - <Link to="/home">Home</Link>
           - <Link to="/user/1">View User 1</Link> - <Link to="/post/1">View Post 1</Link> - <Link to="/about">About</Link>
           - <Link to="/new">Create New</Link>
+          <Button raised color="accent" onClick={App.onLogoutClick}>Logout</Button>
         </div>
         <div>
           {this.props.children}
@@ -86,7 +59,7 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   return state;
 };
 

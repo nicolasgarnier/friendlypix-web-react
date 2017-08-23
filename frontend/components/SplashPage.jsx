@@ -4,9 +4,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import firebase from 'firebase/app';
 import { Link } from 'react-router-dom';
+import FirebaseAuth from '../firebase/FirebaseAuth';
 import 'firebase/auth';
+import { firebaseApp } from '../firebase/firebaseRedux';
 import styles from './splash-page.css';
-import '!style-loader!css-loader!firebaseui/dist/firebaseui.css'; // import globally without running through CSS modules
+import { push } from 'react-router-redux'
 import '!style-loader!css-loader!./firebaseui-overrides.css'; // import globally without running through CSS modules
 
 
@@ -23,37 +25,33 @@ class SplashPage extends React.Component {
    */
   constructor(props) {
     super(props);
-
-    // Load firebase.
-    try {
-      firebase.initializeApp(require('../firebase-config.json').result);
-    } catch(e) {}
+    console.log(props);
   }
 
   /**
    * @inheritDoc
    */
-  componentDidMount() {
-    // Firebase UI only works on the Client. So we're loading in a `componentDidMount`.
-    const firebaseui = require('firebaseui');
-
-    // Configure Firebase UI
-    const uiConfig = {
-      signInSuccessUrl: '/home',
+  componentWillMount() {
+    this.uiConfig = {
       signInFlow: 'popup',
       signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         firebase.auth.FacebookAuthProvider.PROVIDER_ID
-      ]
+      ],
+      callbacks: {
+        signInSuccess: () => {
+          this.props.dispatch(push('/home'));
+          return false;
+        }
+      }
     };
-    const firebaseUi = new firebaseui.auth.AuthUI(firebase.auth());
-    firebaseUi.start('#firebaseui-auth-container', uiConfig);
   }
 
   /**
    * Properties types.
    */
   props: {
+    dispatch: Function
   };
 
   /**
@@ -64,8 +62,8 @@ class SplashPage extends React.Component {
       <div className={styles.container}>
         <div className={styles.logo}><i className={styles.logoIcon + " material-icons"}>photo</i> Friendly Pix</div>
         <div className={styles.caption}>The friendliest way to share your pics</div>
-          <div>
-          <div className={styles.firebaseui} id="firebaseui-auth-container"/>
+        <div>
+          <FirebaseAuth className={styles.firebaseui} uiConfig={this.uiConfig} firebaseAuth={firebaseApp.auth()}/>
           <Link className={styles.skip} to="/recent">skip sign in</Link>
         </div>
       </div>
@@ -73,7 +71,7 @@ class SplashPage extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = state => {
   return state;
 };
 

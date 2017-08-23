@@ -15,6 +15,8 @@
  */
 'use strict';
 
+// needed to fix "Error: The XMLHttpRequest compatibility library was not found." in Firebase client SDK.
+global.XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const functions = require('firebase-functions');
 const path = require('path');
 const fs = require('fs');
@@ -27,9 +29,10 @@ const serverApp = require('../frontend/ServerApp');
 const express = require('express');
 const app = express();
 const firebaseUser = require('./firebaseUser');
-const actionCreators = require('../frontend/actionCreators');
-// needed to fix "Error: The XMLHttpRequest compatibility library was not found." in Firebase client SDK.
-global.XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+const firebaseRedux = require('../frontend/firebase/firebaseRedux');
+const push = require('react-router-redux').push;
+
+
 
 app.use(firebaseUser.authentifyFirebaseUser);
 
@@ -37,19 +40,38 @@ app.get('*', (req, res) => {
   const context = {};
 
   // If a Firebase user was signed in and a custom auth token was generated.
-  serverApp.store.dispatch(actionCreators.setFirebaseCustomAuthToken(req.user ? req.user.token : null));
-
-  const body = ReactDOMServer.renderToString(
-    React.createElement(serverApp.ServerApp, {url: req.url, context})
-  );
-
-  if (context.url) {
-    res.redirect(context.url);
-    res.end();
+  let signInPromise;
+  if (req.user && req.user.token) {
+    signInPromise = serverApp.firebaseApp.auth().signInWithCustomToken(req.user.token).then(user => {
+      console.log('USER SIGNED-IN! ID:', user.uid);
+    });
   } else {
-    const initialState = serverApp.store.getState();
-    res.send(template({body, initialState}));
+    signInPromise = serverApp.firebaseApp.auth().signOut().then(() => {
+      console.log('USER SIGNED-OUT!');
+    });
   }
+
+  signInPromise.then(() => {
+    firebaseRedux.authReady.then(() => {
+      // Set the URL
+      serverApp.history.push(req.url);
+
+
+      const body = ReactDOMServer.renderToString(
+        React.createElement(serverApp.ServerApp, {url: req.url, context})
+      );
+      const initialState = serverApp.store.getState();
+      const lastUrl = initialState.router.location.pathname;
+      if (lastUrl !== req.url) {
+        console.log('Server side redirect to', lastUrl);
+        res.redirect(lastUrl);
+      } else {
+        res.send(template({body, initialState}));
+      }
+    });
+  }).catch(error => {
+    res.status(500).send(error);
+  });
 });
 
 /**

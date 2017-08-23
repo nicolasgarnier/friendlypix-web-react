@@ -23,7 +23,7 @@ try {admin.initializeApp(functions.config().firebase);} catch(e) {}
  * Triggers when a user gets a new follower and sends notifications if the user has enabled them.
  * Also avoids sending multiple notifications for the same user by keeping a timestamp of sent notifications.
  */
-exports.default = functions.database.ref('/followers/{followedUid}/{followerUid}').onWrite(event => {
+exports = module.exports = functions.database.ref('/followers/{followedUid}/{followerUid}').onWrite(event => {
   const followerUid = event.params.followerUid;
   const followedUid = event.params.followedUid;
   // If un-follow we exit the function.
