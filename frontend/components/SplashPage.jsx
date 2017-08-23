@@ -13,12 +13,12 @@ import '!style-loader!css-loader!./firebaseui-overrides.css'; // import globally
 
 
 /**
- * Entry point to the FriendlyPix app.
+ * The Splash Page containing the login UI.
  */
 class SplashPage extends React.Component {
 
   /**
-   * Constructor for the FriendlyPix app.
+   * Constructor for the Splash Page.
    *
    * @param {Object} props - Additional object properties.
    * @constructor
@@ -76,6 +76,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = (dispatch: Function, ownProps) => ({
+  dispatch
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SplashPage);

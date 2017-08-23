@@ -31,7 +31,7 @@ export default class FirebaseAuth extends React.Component {
   componentDidMount() {
     // Firebase UI only works on the Client. So we're loading in a `componentDidMount`.
     const firebaseui = require('firebaseui');
-    this.firebaseUiWidget = new firebaseui.auth.AuthUI(this.firebaseAuth);
+    this.firebaseUiWidget = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(this.firebaseAuth);
     this.firebaseUiWidget.reset();
     this.firebaseUiWidget.start('#firebaseui_' + this.componentId, this.uiConfig);
   }
@@ -40,7 +40,7 @@ export default class FirebaseAuth extends React.Component {
    * @inheritDoc
    */
   componentWillUnmount() {
-    this.firebaseUiWidget.delete();
+    this.firebaseUiWidget.reset();
   }
 
   /**
