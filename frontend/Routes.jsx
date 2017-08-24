@@ -3,7 +3,7 @@
 import React from 'react';
 import { Route } from 'react-router';
 import { push } from 'react-router-redux'
-import App from './components/App';
+import Layout from './components/Layout';
 import { connect } from 'react-redux';
 import SplashPage from './components/SplashPage';
 import HomeFeed from './components/HomeFeed';
@@ -22,10 +22,12 @@ class Routes extends React.Component {
    * Properties types.
    */
   props: {
-    firebase: {
-      currentUser: Object
+    firebaseState: {
+      auth: {
+        isEmpty: boolean
+      }
     },
-    dispatch: Function
+    redirectHome: Function
   };
 
   /**
@@ -34,11 +36,11 @@ class Routes extends React.Component {
   render() {
     // Let's wait for the Firebase auth to be ready before rendering the UI.
     return (
-      <App>
+      <Layout>
         <Route exact path="/" render={() => {
-          if(this.props.firebase.currentUser) {
-            this.props.dispatch(push('/home'));
-            return <div/>;
+          if(!this.props.firebaseState.auth.isEmpty) {
+            this.props.redirectHome();
+            return null;
           } else {
             return <SplashPage/>;
           }
@@ -49,7 +51,7 @@ class Routes extends React.Component {
         <Route path="/post/:id" component={SinglePost}/>
         <Route path="/about" component={About}/>
         <Route path="/new" component={NewPost}/>
-      </App>
+      </Layout>
     )
   }
 }
@@ -59,7 +61,9 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = (dispatch: Function, ownProps) => ({
-  dispatch
+  redirectHome() {
+    dispatch(push('/home'));
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Routes);

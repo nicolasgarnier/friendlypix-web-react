@@ -4,14 +4,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Button } from 'material-ui';
+import { compose } from 'redux';
+import { firebaseConnect } from 'react-redux-firebase';
 import './app.css';
-import { firebaseApp } from '../firebase/firebaseRedux';
-
 
 /**
  * Entry point to the FriendlyPix app.
  */
-class App extends React.Component {
+class Layout extends React.Component {
 
   /**
    * Constructor for the FriendlyPix app.
@@ -28,14 +28,18 @@ class App extends React.Component {
    */
   props: {
     children: any,
-    firebaseCustomAuthToken: string | void
+    firebaseCustomAuthToken: string | void,
+    firebase: {
+      logout: Function
+    }
   };
 
   /**
    * Handles click to the logout button.
    */
-  static onLogoutClick() {
-    firebaseApp.auth().signOut();
+  onLogoutClick() {
+    console.log('this.props', this.props);
+    this.props.firebase.logout();
   }
 
   /**
@@ -49,7 +53,7 @@ class App extends React.Component {
           <Link to="/">Splash</Link> - <Link to="/recent">Recent Posts Feed</Link> - <Link to="/home">Home</Link>
           - <Link to="/user/1">View User 1</Link> - <Link to="/post/1">View Post 1</Link> - <Link to="/about">About</Link>
           - <Link to="/new">Create New</Link>
-          <Button raised color="accent" onClick={App.onLogoutClick}>Logout</Button>
+          <Button raised color="accent" onClick={this.props.firebase.logout}>Logout</Button>
         </div>
         <div>
           {this.props.children}
@@ -59,11 +63,12 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
+  console.log('State:', state);
   return state;
 };
 
 const mapDispatchToProps = (dispatch: Function, ownProps) => ({
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default compose(firebaseConnect(), connect(mapStateToProps, mapDispatchToProps))(Layout);

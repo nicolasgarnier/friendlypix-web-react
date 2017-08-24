@@ -5,10 +5,11 @@ import { connect } from 'react-redux';
 import firebase from 'firebase/app';
 import { Link } from 'react-router-dom';
 import FirebaseAuth from '../firebase/FirebaseAuth';
+import { firebaseConnect } from 'react-redux-firebase';
 import 'firebase/auth';
-import { firebaseApp } from '../firebase/firebaseRedux';
 import styles from './splash-page.css';
-import { push } from 'react-router-redux'
+import { push } from 'react-router-redux';
+import { compose } from 'redux'
 import '!style-loader!css-loader!./firebaseui-overrides.css'; // import globally without running through CSS modules
 
 
@@ -40,7 +41,7 @@ class SplashPage extends React.Component {
       ],
       callbacks: {
         signInSuccess: () => {
-          this.props.dispatch(push('/home'));
+          this.props.redirectHome();
           return false;
         }
       }
@@ -51,7 +52,10 @@ class SplashPage extends React.Component {
    * Properties types.
    */
   props: {
-    dispatch: Function
+    redirectHome: Function,
+    firebase: {
+      auth: Function
+    }
   };
 
   /**
@@ -63,7 +67,7 @@ class SplashPage extends React.Component {
         <div className={styles.logo}><i className={styles.logoIcon + " material-icons"}>photo</i> Friendly Pix</div>
         <div className={styles.caption}>The friendliest way to share your pics</div>
         <div>
-          <FirebaseAuth className={styles.firebaseui} uiConfig={this.uiConfig} firebaseAuth={firebaseApp.auth()}/>
+          <FirebaseAuth className={styles.firebaseui} uiConfig={this.uiConfig} firebaseAuth={this.props.firebase.auth()}/>
           <Link className={styles.skip} to="/recent">skip sign in</Link>
         </div>
       </div>
@@ -76,7 +80,9 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = (dispatch: Function, ownProps) => ({
-  dispatch
+  redirectHome() {
+    dispatch(push('/home'));
+  }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SplashPage);
+export default compose(firebaseConnect(), connect(mapStateToProps, mapDispatchToProps))(SplashPage);

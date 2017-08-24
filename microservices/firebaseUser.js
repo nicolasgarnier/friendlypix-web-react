@@ -23,7 +23,7 @@ try {
   firebaseAdminApp = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: `https://${process.env.GCLOUD_PROJECT}.firebaseio.com`
-  }, 'service-account');
+  }, '__service_account');
 } catch(e) {
   if (e.code !== 'app/duplicate-app') {
     console.error('There was an error initializing Firebase Admin', e);
@@ -31,7 +31,7 @@ try {
   }
   // An app for that UID was already created so we re-use it.
   console.log('Re-using existing app.');
-  firebaseAdminApp = admin.app('service-account');
+  firebaseAdminApp = admin.app('__service_account');
 }
 
 // Express middleware that checks if a Firebase ID Tokens is passed in the `Authorization` HTTP
