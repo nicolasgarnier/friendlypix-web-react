@@ -9,8 +9,8 @@ import { createBrowserHistory, createMemoryHistory } from 'history';
 import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
 import * as reducers from './reducers';
 import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
+import 'firebase/auth'
+import 'firebase/database'
 import { reactReduxFirebase, getFirebase, firebaseStateReducer } from 'react-redux-firebase';
 import firebaseTools from  './firebase/firebaseTools';
 
@@ -44,7 +44,7 @@ export const store = createStore(
   compose(
     applyMiddleware(thunk.withExtraArgument(getFirebase)),
     applyMiddleware(historyMiddleware),
-    reactReduxFirebase(firebase, {enableRedirectHandling: false})
+    reactReduxFirebase(firebaseApp, {enableRedirectHandling: false})
   )
 );
 
@@ -69,8 +69,5 @@ export class App extends React.Component {
 // On the client, display the app.
 if (canUseDOM) {
   // Render the app.
-  ReactDOM.render(
-    <App/>,
-    document.getElementById('app')
-  );
+  ReactDOM.render(<App/>, document.getElementById('app'));
 }

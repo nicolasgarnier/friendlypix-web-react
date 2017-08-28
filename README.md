@@ -6,9 +6,11 @@ Friendly Pix is a place where you can share photos, follow friends, comment on p
 
 The following React techs are being used:
  - Isomorphism with `ReactDOMServer` hosted on Cloud Functions
- - Router v4
+ - React Router v4
  - CSS Modules
  - Redux
+ - Firebase UI
+ - react-redux-firebase v2
 
 
 ## Initial setup, build tools and dependencies
