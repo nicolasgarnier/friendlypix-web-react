@@ -31,6 +31,7 @@ $ npm install
 ## Create and configure your Firebase Project
 
 1. Create a Firebase project using the [Firebase Console](https://firebase.google.com/console).
+2. Generate a Service accounts file from **⚙ > Project Settings > Service Accounts > GENERATE NEW PRIVATE KEY > GENERATE KEY** and save it as `./microservices/service-account-credentials.json`
 2. Enable **Google** as a Sign in provider in **Firebase Console > Authentication > Sign in Method** tab.
 3. Enable **Facebook** as a Sign in provider in **Firebase Console > Authentication > Sign in Method** tab. You'll need to provide your Facebook app's credentials. If you haven't yet you'll need to have created a Facebook app on [Facebook for Developers](https://developers.facebook.com)
 4. At the root of the site run `firebase use --add`. When prompted select the Firebase Project you have just created. This will make sure the Firebase CLI is configured to use your particular project.
