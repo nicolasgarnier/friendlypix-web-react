@@ -28,40 +28,45 @@ const template = _.template(baseTemplate);
 const app = require('../frontend/App');
 const express = require('express');
 const router = new express.Router();
-const firebaseUser = require('./firebaseUser');
+const firebaseMiddleware = require('./firebase-express-middleware');
+const createMemoryHistory = require('history').createMemoryHistory;
+const firebase = require('firebase');
+// Get the Firebase config from the auto generated file.
+const firebaseConfig = require('../frontend/firebase-config.json').result;
+
 
 // This Express middleware will check ig there is a Firebase ID token and inject
-router.use(firebaseUser.authentifyFirebaseUser);
+router.use(firebaseMiddleware.authentifyFirebaseUser());
 
 router.get('*', (req, res) => {
+  const user = req.user || {};
+  createFirebaseAppWithSignedInUser(user.uid, user.token).then(firebaseApp => {
+    // We make sure that the firebase auth state listeners are triggered again.
+    // Create the redux store.
+    const history = createMemoryHistory();
+    // Set the new URL.
+    history.replace(req.url);
+    const store = app.makeStore(history, firebaseApp);
+    require('../frontend/firebase/firebaseTools').default(firebaseApp).authReadyPromise.then(() => {
+      // Render the App.
+      const body = ReactDOMServer.renderToString(
+        React.createElement(app.App, {store: store, history: history})
+      );
 
-  // If a Firebase user was signed in and a custom auth token was generated.
-  let signInPromise;
-  if (req.user && req.user.token) {
-    signInPromise = app.firebaseApp.auth().signInWithCustomToken(req.user.token).then(user => {
-      console.log('USER SIGNED-IN! ID:', user.uid);
+      // Get the state of the redux store.
+      const initialState = store.getState();
+
+      // Check if there has been a redirect.
+      const lastUrl = initialState.router.location.pathname;
+      if (lastUrl !== req.url) {
+        // If there has been a redirect we redirect server side.
+        console.log('Server side redirect to', lastUrl);
+        res.redirect(lastUrl);
+      } else {
+        // If there was no redirect we send the rendered app as well as the redux state.
+        res.send(template({body, initialState}));
+      }
     });
-  } else {
-    signInPromise = app.firebaseApp.auth().signOut().then(() => {
-      console.log('USER SIGNED-OUT!');
-    });
-  }
-
-  signInPromise.then(() => {
-    // Sets the URL
-    app.history.push(req.url);
-
-    const body = ReactDOMServer.renderToString(
-      React.createElement(app.App)
-    );
-    const initialState = app.store.getState();
-    const lastUrl = initialState.router.location.pathname;
-    if (lastUrl !== req.url) {
-      console.log('Server side redirect to', lastUrl);
-      res.redirect(lastUrl);
-    } else {
-      res.send(template({body, initialState}));
-    }
   }).catch(error => {
     console.log('There was an error', error);
     res.status(500).send(error);
@@ -73,3 +78,43 @@ router.get('*', (req, res) => {
  * send the server-side markup to the client
  */
 exports = module.exports = functions.https.onRequest(router);
+
+/**
+ * Returns a Firebase App instance
+ *
+ * @param {String} uid - The UID of the user to sign in the app.
+ * @param {String} customToken - A custom token to sign the user in the app.
+ * @return {Promise<Object>} - A Firebase App instance specific to the given user with the user already signed-in.
+ */
+function createFirebaseAppWithSignedInUser(uid = undefined, customToken) {
+  // Instantiate a Firebase app.
+  let firebaseApp;
+  // Try to re-use cached firebase App.
+  try {
+    firebaseApp = firebase.app(/* uid */); // Uncomment. aka create named apps whe this bug is fixed: https://github.com/prescottprue/react-redux-firebase/issues/250
+    console.log('Re-used a cached app for UID', uid);
+  } catch(e) {
+    firebaseApp = firebase.initializeApp(firebaseConfig/* , uid */); // Uncomment. aka create named apps when this bug is fixed: https://github.com/prescottprue/react-redux-firebase/issues/250
+    console.log('Created a new Firebase App instance for UID', uid);
+  }
+
+  // Check if a Firebase user was signed in and a custom auth token was generated.
+  let signInPromise;
+  const firebaseAppUid = firebaseApp.auth().currentUser ? firebaseApp.auth().currentUser.uid : undefined;
+  if (uid === firebaseAppUid) {
+    signInPromise = Promise.resolve();
+    console.log('Firebase App instance auth state is already correct.');
+  } else if (uid && customToken) {
+    console.log('Need to sign in user in Firebase App instance.');
+    signInPromise = firebaseApp.auth().signInWithCustomToken(customToken).then(user => {
+      console.log('User now signed-in! uid:', user.uid);
+    });
+  } else {
+    console.log('Need to sign out user in Firebase App instance.');
+    signInPromise = firebaseApp.auth().signOut().then(() => {
+      console.log('User now signed-out!');
+    });
+  }
+
+  return signInPromise.then(() => firebaseApp);
+};

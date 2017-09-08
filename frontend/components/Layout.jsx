@@ -35,14 +35,6 @@ class Layout extends React.Component {
   };
 
   /**
-   * Handles click to the logout button.
-   */
-  onLogoutClick() {
-    console.log('this.props', this.props);
-    this.props.firebase.logout();
-  }
-
-  /**
    * @inheritDoc
    */
   render() {
@@ -64,7 +56,6 @@ class Layout extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log('State:', state);
   return state;
 };
 

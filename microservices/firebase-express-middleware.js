@@ -17,6 +17,8 @@
 
 const cookieParser = require('cookie-parser')();
 const admin = require('firebase-admin');
+
+// Configure Firebase Admin.
 const serviceAccount = require('./service-account-credentials.json');
 let firebaseAdminApp;
 try {
@@ -34,29 +36,42 @@ try {
   firebaseAdminApp = admin.app('__service_account');
 }
 
+
 // Express middleware that checks if a Firebase ID Tokens is passed in the `Authorization` HTTP
 // header or the `__session` cookie and decodes it.
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
 // `Authorization: Bearer <Firebase ID Token>`.
 // When decoded successfully, the ID Token content will be added as `req.user`.
-exports.authentifyFirebaseUser = (req, res, next) => {
-  console.log('Check if request is authorized with Firebase ID token');
+exports.authentifyFirebaseUser = config => {
+  if (!config) {
+    config = {
+      checkcookie: true,
+      checkheader: true,
+      cookiename: '__session',
+      generatecustomtoken: true,
+      serviceaccountcredentials: './service-account-credentials.json'
+    };
+  }
 
-  getIdTokenFromRequest(req, res).then(idToken => {
-    if (idToken) {
-      addDecodedIdTokenToRequest(idToken, req).then(() => {
-        if (req.user) {
-          addCustomTokenToRequest(req.user.uid, req).then(() => {
+  return (req, res, next) => {
+    console.log('Check if request is authorized with Firebase ID token');
+
+    getIdTokenFromRequest(req, res).then(idToken => {
+      if (idToken) {
+        addDecodedIdTokenToRequest(idToken, req).then(() => {
+          if (req.user) {
+            addCustomTokenToRequest(req.user.uid, req).then(() => {
+              next();
+            });
+          } else {
             next();
-          });
-        } else {
-          next();
-        }
-      });
-    } else {
-      next();
-    }
-  });
+          }
+        });
+      } else {
+        next();
+      }
+    });
+  };
 };
 
 /**
@@ -68,12 +83,12 @@ function getIdTokenFromRequest(req, res) {
     // Read the ID Token from the Authorization header.
     return Promise.resolve(req.headers.authorization.split('Bearer ')[1]);
   }
-  return new Promise(function(resolve) {
+  return new Promise(resolve => {
     cookieParser(req, res, () => {
-      if (req.cookies && req.cookies.__session) {
+      if (req.cookies && req.cookies['__session']) {
         console.log('Found "__session" cookie');
         // Read the ID Token from cookie.
-        resolve(req.cookies.__session);
+        resolve(req.cookies['__session']);
       } else {
         resolve();
       }
@@ -86,7 +101,7 @@ function getIdTokenFromRequest(req, res) {
  */
 function addDecodedIdTokenToRequest(idToken, req) {
   return firebaseAdminApp.auth().verifyIdToken(idToken).then(decodedIdToken => {
-    console.log('ID Token correctly decoded', decodedIdToken);
+    console.log('ID Token correctly decoded');
     req.user = decodedIdToken;
   }).catch(error => {
     console.error('Error while verifying Firebase ID token:', error);

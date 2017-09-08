@@ -30,10 +30,10 @@ const config = {
   devtool: 'cheap-module-source-map',
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
-    alias: {
-      react: 'preact-compat',
-      'react-dom': 'preact-compat'
-    }
+  //   alias: {
+  //     react: 'preact-compat',
+  //     'react-dom': 'preact-compat'
+  //   }
   },
   stats: {
     colors: true,

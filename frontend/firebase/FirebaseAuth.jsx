@@ -3,8 +3,8 @@
 import React from 'react';
 import '!style-loader!css-loader!firebaseui/dist/firebaseui.css'; // import globally without running through CSS modules
 
-// Global ID counter.
-let idCounter = 0;
+// Global ID for the element.
+const ELEMENT_ID = 'firebaseui_container';
 
 /**
  * React Component wrapper for the FirebaseUI Auth widget.
@@ -21,7 +21,6 @@ export default class FirebaseAuth extends React.Component {
     super(props);
 
     this.uiConfig = props.uiConfig;
-    this.componentId = idCounter++;
     this.firebaseAuth = props.firebaseAuth;
   }
 
@@ -33,7 +32,7 @@ export default class FirebaseAuth extends React.Component {
     const firebaseui = require('firebaseui');
     this.firebaseUiWidget = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(this.firebaseAuth);
     this.firebaseUiWidget.reset();
-    this.firebaseUiWidget.start('#firebaseui_' + this.componentId, this.uiConfig);
+    this.firebaseUiWidget.start('#' + ELEMENT_ID, this.uiConfig);
   }
 
   /**
@@ -56,7 +55,7 @@ export default class FirebaseAuth extends React.Component {
    */
   render() {
     return (
-      <div id={`firebaseui_${this.componentId}`}/>
+      <div id={ELEMENT_ID}/>
     )
   }
 }

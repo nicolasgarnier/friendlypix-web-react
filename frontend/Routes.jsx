@@ -27,8 +27,37 @@ class Routes extends React.Component {
         isEmpty: boolean
       }
     },
+    router: {
+      location: {
+        pathname: string
+      }
+    },
     redirectHome: Function
   };
+
+  /**
+   * @inheritDoc
+   */
+  componentWillReceiveProps(nextProps) {
+    this.onRouting(nextProps.router.location.pathname, nextProps);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  componentWillMount() {
+    this.onRouting(this.props.router.location.pathname, this.props);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  onRouting(destinationPath, props) {
+    if (destinationPath === '/'
+        && !props.firebaseState.auth.isEmpty) {
+      props.redirectHome();
+    }
+  }
 
   /**
    * @inheritDoc
@@ -37,14 +66,7 @@ class Routes extends React.Component {
     // Let's wait for the Firebase auth to be ready before rendering the UI.
     return (
       <Layout>
-        <Route exact path="/" render={() => {
-          if(!this.props.firebaseState.auth.isEmpty) {
-            this.props.redirectHome();
-            return null;
-          } else {
-            return <SplashPage/>;
-          }
-        }}/>
+        <Route exact path="/" component={SplashPage}/>
         <Route path="/home" component={HomeFeed}/>
         <Route path="/recent" component={RecentPostsFeed}/>
         <Route path="/user/:id" component={UserProfile}/>

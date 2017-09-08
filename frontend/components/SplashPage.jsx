@@ -3,10 +3,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import firebase from 'firebase/app';
+import 'firebase/auth';
 import { Link } from 'react-router-dom';
 import FirebaseAuth from '../firebase/FirebaseAuth';
 import { firebaseConnect } from 'react-redux-firebase';
-import 'firebase/auth';
 import styles from './splash-page.css';
 import { push } from 'react-router-redux';
 import { compose } from 'redux'
@@ -26,13 +26,7 @@ class SplashPage extends React.Component {
    */
   constructor(props) {
     super(props);
-    console.log(props);
-  }
 
-  /**
-   * @inheritDoc
-   */
-  componentWillMount() {
     this.uiConfig = {
       signInFlow: 'popup',
       signInOptions: [
@@ -67,7 +61,7 @@ class SplashPage extends React.Component {
         <div className={styles.logo}><i className={styles.logoIcon + " material-icons"}>photo</i> Friendly Pix</div>
         <div className={styles.caption}>The friendliest way to share your pics</div>
         <div>
-          <FirebaseAuth className={styles.firebaseui} uiConfig={this.uiConfig} firebaseAuth={this.props.firebase.auth()}/>
+          <FirebaseAuth className={styles.firebaseUi} uiConfig={this.uiConfig} firebaseAuth={this.props.firebase.auth()}/>
           <Link className={styles.skip} to="/recent">skip sign in</Link>
         </div>
       </div>
