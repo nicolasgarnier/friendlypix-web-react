@@ -118,7 +118,7 @@ if (canUseDOM) {
   const firebaseApp = firebase.initializeApp(firebaseConfig);
 
   // Make sure we copy the ID Token to the __session cookie.
-  firebaseTools(firebaseApp).copyIdTokenToCookie('__session');
+  firebaseTools.copyIdTokenToCookie(firebaseApp, '__session');
 
   const history = createBrowserHistory();
   const store = makeStore(history, firebaseApp, window.__REDUX_STATE__);
