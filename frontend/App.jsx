@@ -28,7 +28,7 @@ import * as reducers from './reducers';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import { reactReduxFirebase, getFirebase, firebaseStateReducer } from 'react-redux-firebase';
-import firebaseTools from './firebaseTools';
+import { whenAuthReady, copyIdTokenToCookie } from './firebaseTools';
 
 /**
  * Loads the App in a server context.
@@ -80,35 +80,6 @@ export function makeStore(history, firebaseApp, initialState = {}) {
   );
 }
 
-/**
- * Returns a promise that completes when Firebase Auth is ready in the given store using react-redux-firebase.
- *
- * @param {Object} store - The Redux store on which we want to detect if Firebase auth is ready.
- * @param {string} [firebaseReducerAttributeName] - The attribute name of the react-redux-firebase reducer. 'firebaseState' by default.
- * @return {Promise} - A promise that completes when Firebase auth is ready in the store.
- */
-export function whenAuthReady(store, firebaseReducerAttributeName = 'firebaseState') {
-  const isAuthReady = store => {
-    const state = store.getState();
-    const firebaseState = firebaseReducerAttributeName ? state[firebaseReducerAttributeName] : state;
-    return firebaseState && firebaseState.auth && firebaseState.auth.isLoaded;
-  };
-
-  return new Promise(accept => {
-    if (isAuthReady(store)) {
-      console.log('Redux store Firebase auth state is ready!');
-      return accept();
-    }
-    let unsubscribe = store.subscribe(() => {
-      if (isAuthReady(store)) {
-        console.log('Redux store Firebase auth state is ready!');
-        unsubscribe();
-        accept();
-      }
-    });
-  });
-}
-
 // On the client, display the app.
 if (canUseDOM) {
   // Get the Firebase config from the auto generated file.
@@ -118,7 +89,7 @@ if (canUseDOM) {
   const firebaseApp = firebase.initializeApp(firebaseConfig);
 
   // Make sure we copy the ID Token to the __session cookie.
-  firebaseTools.copyIdTokenToCookie(firebaseApp, '__session');
+  copyIdTokenToCookie(firebaseApp, '__session');
 
   const history = createBrowserHistory();
   const store = makeStore(history, firebaseApp, window.__REDUX_STATE__);

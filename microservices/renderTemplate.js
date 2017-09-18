@@ -26,6 +26,7 @@ const _ = require('lodash');
 const baseTemplate = fs.readFileSync(path.resolve(__dirname, './index.html'));
 const template = _.template(baseTemplate);
 const app = require('../frontend/App');
+const firebaseTools = require('../frontend/firebaseTools');
 const express = require('express');
 const router = new express.Router();
 const firebaseMiddleware = require('./firebase-express-middleware');
@@ -48,7 +49,7 @@ router.get('*', (req, res) => {
     history.replace(req.url);
     const store = app.makeStore(history, firebaseApp);
     // Wait for auth to be ready.
-    app.whenAuthReady(store).then(() => {
+    firebaseTools.whenAuthReady(store).then(() => {
       // Render the App.
       const body = ReactDOMServer.renderToString(
         React.createElement(app.App, {store: store, history: history})

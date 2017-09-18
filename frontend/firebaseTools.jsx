@@ -43,3 +43,32 @@ export function copyIdTokenToCookie(firebaseApp, cookieName) {
     return () => {};
   }
 }
+
+/**
+ * Returns a promise that completes when Firebase Auth is ready in the given store using react-redux-firebase.
+ *
+ * @param {Object} store - The Redux store on which we want to detect if Firebase auth is ready.
+ * @param {string} [firebaseReducerAttributeName] - The attribute name of the react-redux-firebase reducer. 'firebaseState' by default.
+ * @return {Promise} - A promise that completes when Firebase auth is ready in the store.
+ */
+export function whenAuthReady(store, firebaseReducerAttributeName = 'firebaseState') {
+  const isAuthReady = store => {
+    const state = store.getState();
+    const firebaseState = firebaseReducerAttributeName ? state[firebaseReducerAttributeName] : state;
+    return firebaseState && firebaseState.auth && firebaseState.auth.isLoaded;
+  };
+
+  return new Promise(accept => {
+    if (isAuthReady(store)) {
+      console.log('Redux store Firebase auth state is ready!');
+      return accept();
+    }
+    let unsubscribe = store.subscribe(() => {
+      if (isAuthReady(store)) {
+        console.log('Redux store Firebase auth state is ready!');
+        unsubscribe();
+        accept();
+      }
+    });
+  });
+}
