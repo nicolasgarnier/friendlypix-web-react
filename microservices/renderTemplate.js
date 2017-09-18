@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,8 @@ router.get('*', (req, res) => {
     // Set the new URL.
     history.replace(req.url);
     const store = app.makeStore(history, firebaseApp);
-    require('../frontend/firebase/firebaseTools').default(firebaseApp).authReadyPromise.then(() => {
+    // Wait for auth to be ready.
+    app.whenAuthReady(store).then(() => {
       // Render the App.
       const body = ReactDOMServer.renderToString(
         React.createElement(app.App, {store: store, history: history})
@@ -63,6 +64,7 @@ router.get('*', (req, res) => {
         console.log('Server side redirect to', lastUrl);
         res.redirect(lastUrl);
       } else {
+        res.set('Cache-Control', 'public, max-age=60, s-maxage=180'); // TODO: make this change dependent on each URL. with a map maybe??
         // If there was no redirect we send the rendered app as well as the redux state.
         res.send(template({body, initialState}));
       }
