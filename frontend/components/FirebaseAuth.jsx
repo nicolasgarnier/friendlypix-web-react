@@ -16,7 +16,7 @@
 // @flow
 
 import React from 'react';
-import '!style-loader!css-loader!firebaseui/dist/firebaseui.css'; // import globally without running through CSS modules
+import 'firebaseui/dist/firebaseui.css'; // import globally.
 
 // Global ID for the element.
 const ELEMENT_ID = 'firebaseui_container';

@@ -75,6 +75,7 @@ const config = {
       },
       {
         test: /\.css$/,
+        exclude: [/\.global\./, /node_modules/],
         loader: ExtractTextPlugin.extract(
           {
             fallback: 'style-loader',
@@ -84,12 +85,27 @@ const config = {
                 options: {
                   importLoaders: 1,
                   modules: true,
-                  autoprefixer: false,
+                  autoprefixer: true,
                   localIdentName: '[name]__[local]___[hash:base64:5]'
                 }
-              },
+              }
+            ]
+          })
+      },
+      {
+        test: /\.css/,
+        include: [/\.global\./, /node_modules/],
+        loader: ExtractTextPlugin.extract(
+          {
+            fallback: 'style-loader',
+            use:[
               {
-                loader: 'postcss-loader'
+                loader: 'css-loader',
+                options: {
+                  importLoaders: 1,
+                  modules: false,
+                  autoprefixer: false
+                }
               }
             ]
           })

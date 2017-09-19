@@ -25,7 +25,7 @@ import { firebaseConnect } from 'react-redux-firebase';
 import styles from './splash-page.css';
 import { push } from 'react-router-redux';
 import { compose } from 'redux'
-import '!style-loader!css-loader!./firebaseui-overrides.css'; // import globally without running through CSS modules
+import './firebaseui-overrides.global.css'; // Import globally.
 
 
 /**

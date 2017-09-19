@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-:global html, :global body {
+html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
 }
-:global a {
+a {
   text-decoration: underline;
   color: #039BE5;
 }

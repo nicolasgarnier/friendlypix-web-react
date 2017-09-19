@@ -14,3 +14,15 @@ frontend/reducers.js
 frontend/Routes.js
 frontend/ServerApp.js
 /public/bundle.css
+/public/fonts
+frontend/App.js
+frontend/firebaseTools.js
+frontend/components/About.js
+frontend/components/FirebaseAuth.js
+frontend/components/HomeFeed.js
+frontend/components/Layout.js
+frontend/components/NewPost.js
+frontend/components/RecentPostsFeed.js
+frontend/components/SinglePost.js
+frontend/components/SplashPage.js
+UserProfile.js

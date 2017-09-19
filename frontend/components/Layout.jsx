@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom';
 import { Button } from 'material-ui';
 import { compose } from 'redux';
 import { firebaseConnect } from 'react-redux-firebase';
-import './app.css';
+import './app.global.css';
 
 /**
  * Entry point to the FriendlyPix app.
