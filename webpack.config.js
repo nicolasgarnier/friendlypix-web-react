@@ -86,6 +86,7 @@ const config = {
                   importLoaders: 1,
                   modules: true,
                   autoprefixer: true,
+                  minimize: true,
                   localIdentName: '[name]__[local]___[hash:base64:5]'
                 }
               }
@@ -104,7 +105,7 @@ const config = {
                 options: {
                   importLoaders: 1,
                   modules: false,
-                  autoprefixer: false
+                  minimize: true
                 }
               }
             ]

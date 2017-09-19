@@ -18,7 +18,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Button } from 'material-ui';
+import Button from 'material-ui/Button';
 import { compose } from 'redux';
 import { firebaseConnect } from 'react-redux-firebase';
 import './app.global.css';
