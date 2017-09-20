@@ -34,10 +34,20 @@ const createMemoryHistory = require('history').createMemoryHistory;
 const firebase = require('firebase');
 // Get the Firebase config from the auto generated file.
 const firebaseConfig = require('../frontend/firebase-config.json').result;
+// Create a Firebase Admin app
+const admin = require('firebase-admin');
+const serviceAccount = require('./service-account-credentials.json');
+const firebaseAdminApp = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+}, '__service_account');
 
 
 // This Express middleware will check ig there is a Firebase ID token and inject
-router.use(firebaseMiddleware.authentifyFirebaseUser());
+router.use(firebaseMiddleware.auth({
+  checkCookie: true,
+  generateCustomToken: true,
+  firebaseAdminApp: firebaseAdminApp
+}));
 
 router.get('*', (req, res) => {
   const user = req.user || {};
