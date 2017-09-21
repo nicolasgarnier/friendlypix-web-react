@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const cookieParser = require('cookie-parser')();
+const cookie = require('cookie');
 const admin = require('firebase-admin');
 
 /**
@@ -97,19 +97,20 @@ const DEFAULT_CONFIG = {
  *
  * @param {Object} [config] - The configuration object for the middleware.
  * @param {boolean} [config.checkHeader] - If `true` the middleware will check if an ID Token is
- *     passed in the `Authorization` HTTP header as Bearer token. If `undefined` this defaults as
- *     `true`.
+ *     passed in the `Authorization` HTTP header as Bearer token. This defaults as `true`.
  * @param {boolean} [config.checkCookie] - If `true` the middleware will check if an ID Token is
  *     passed in the a cookie. The name of the cookie to check can be configured using
- *     `config.cookieName`. If `undefined` this defaults as `false`.
+ *     `config.cookieName`. This defaults as `false`.
  * @param {boolean} [config.cookieName] - The name of the cookie to check if `config.checkCookie`
- *     is `true`. If `undefined` this defaults as `"__session"`.
+ *     is `true`. This defaults as `"__session"`.
  * @param {boolean} [config.generateCustomToken] - If `true` the middleware will generate a
- *     Firebase Custom Auth token in `req.user.token` if a valid ID token is found. If `undefined`
- *     this defaults as `false`.
+ *     Firebase Custom Auth token in `req.user.token` if a valid ID token is found. This defaults
+ *     as `false`.
  * @param {boolean} [config.firebaseAdminApp] - A Firebase Admin app instance that will be used to
  *     decode the ID token and generate the Custom Auth token if `config.generateCustomToken` is
- *     `true`.
+ *     `true`. If none is provided a Firebae Admin app will be instanciated wuing the app default
+ *     credentials which his only possible in a Google Cloud environment (Google App Engine, Google
+ *     Compute Engine, Firebase Functions...) and does not allow generating Custom auth tokens.
  * @return {Object} - The configured Firebase Auth Express Middleware.
  */
 export function auth(config) {
@@ -123,50 +124,42 @@ export function auth(config) {
     console.log('Check if request is authorized with Firebase ID token');
 
     let idToken;
-    const getIdTokenPromises = [];
-
-    // Check cookies for an ID Token.
-    if (config.checkCookie) {
-      getIdTokenPromises.push(getIdTokenFromCookie(req, config.cookieName).then(encodedIdToken => {
-        idToken = encodedIdToken;
-      }));
-    }
 
     // Check auth header for an ID Token.
     if (config.checkHeader) {
-      getIdTokenPromises.push(getIdTokenFromRequestHeader(req).then(encodedIdToken => {
-        // If two ID tokens are found in both Cookie and Header, the Header takes priority.
-        if (!idToken || encodedIdToken) {
-          idToken = encodedIdToken;
-        }
-      }));
+      idToken = getIdTokenFromRequestHeader(req);
     }
-    Promise.all(getIdTokenPromises).then(() => {
-      if (idToken) {
-        // If no Firebase Admin app was provided in the config we use one with default credentials.
-        const firebaseAdminApp = config.firebaseAdminApp || getDefaultFirebaseAdminApp();
 
-        // Make sure we have a usable Firebase Admin app instance.
-        if (!firebaseAdminApp instanceof Object && firebaseAdminApp.auth instanceof Function) {
-          console.error('We could not create a Firebase Admin app with default credentials.',
-              'You can pass a Firebase Admin app instance using `config.firebaseAdminApp`.');
-          next();
-          return;
-        }
-        // We found an ID token, let's try to decode it.
-        decodeIdToken(idToken, firebaseAdminApp).then(user => {
-          req.user = user;
-          if (req.user && config.generateCustomToken) {
-            // We successfully decoded the ID token and we want to generate a custom ID token.
-            return generateCustomAuthToken(req.user.uid, firebaseAdminApp)
-                .then(customAuthToken => req.user.token = customAuthToken);
-          }
-        }).then(() => next());
-      } else {
-        console.log('Found no Firebase ID token in request.');
+    // Check cookies for an ID Token. The ID Token from a request header has priority if both exist.
+    if (!idToken && config.checkCookie) {
+      idToken = getIdTokenFromCookie(req, config.cookieName);
+    }
+
+    if (idToken) {
+      // If no Firebase Admin app was provided in the config we use one with default credentials.
+      const firebaseAdminApp = config.firebaseAdminApp || getDefaultFirebaseAdminApp();
+
+      // Make sure we have a usable Firebase Admin app instance.
+      if (!firebaseAdminApp instanceof Object && firebaseAdminApp.auth instanceof Function) {
+        console.error('We could not create a Firebase Admin app with default credentials.',
+            'You can pass a Firebase Admin app instance to the Firebase express middleware using',
+            '`config.firebaseAdminApp`.');
         next();
+        return;
       }
-    });
+      // We found an ID token, let's try to decode it.
+      decodeIdToken(idToken, firebaseAdminApp).then(user => {
+        req.user = user;
+        if (req.user && config.generateCustomToken) {
+          // We successfully decoded the ID token and we want to generate a custom ID token.
+          return generateCustomAuthToken(req.user.uid, firebaseAdminApp)
+              .then(customAuthToken => req.user.token = customAuthToken);
+        }
+      }).then(() => next());
+    } else {
+      console.log('Found no Firebase ID token in request.');
+      next();
+    }
   };
 }
 
@@ -174,15 +167,14 @@ export function auth(config) {
  * Returns a Promise with the Firebase ID Token if found in the Authorization header.
  *
  * @param {Object} req - The request object.
- * @return {Promise<String>} - The encoded ID token.
+ * @return {String} - The encoded ID token.
  */
 function getIdTokenFromRequestHeader(req) {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-    console.log('Found "Authorization" header');
-    // Read the ID Token from the Authorization header.
-    return Promise.resolve(req.headers.authorization.split('Bearer ')[1]);
+    console.log('Found Bearer token in "Authorization" header.');
+    // Return the ID Token from the Authorization header.
+    return req.headers.authorization.split('Bearer ')[1];
   }
-  return Promise.resolve();
 }
 
 
@@ -194,17 +186,14 @@ function getIdTokenFromRequestHeader(req) {
  * @return {Promise<String>} - The encoded ID token.
  */
 function getIdTokenFromCookie(req, cookieName) {
-  return new Promise(resolve => {
-    cookieParser(req, {}, () => {
-      if (req.cookies && req.cookies[cookieName]) {
-        console.log('Found "', cookieName, '" cookie');
-        // Read the ID Token from cookie.
-        resolve(req.cookies[cookieName]);
-      } else {
-        resolve();
-      }
-    });
-  });
+  if (req.headers.cookie) {
+    const cookies = cookie.parse(req.headers.cookie);
+    if (cookies && cookies[cookieName]) {
+      console.log('Found "', cookieName, '" cookie.');
+      // Read the ID Token from cookie.
+      return cookies[cookieName];
+    }
+  }
 }
 
 /**
@@ -216,7 +205,7 @@ function getIdTokenFromCookie(req, cookieName) {
  */
 function decodeIdToken(idToken, firebaseAdminApp) {
   return firebaseAdminApp.auth().verifyIdToken(idToken).then(decodedIdToken => {
-    console.log('ID Token correctly decoded');
+    console.log('Firebase ID Token correctly decoded.');
     return decodedIdToken;
   }).catch(error => {
     console.error('Error while verifying Firebase ID token:', error);
@@ -232,7 +221,7 @@ function decodeIdToken(idToken, firebaseAdminApp) {
  */
 function generateCustomAuthToken(uid, firebaseAdminApp) {
   return firebaseAdminApp.auth().createCustomToken(uid).then(token => {
-    console.log('Created Custom token for UID "', uid, '" Token:', token);
+    console.log('Created Custom token for UID:', uid);
     return token;
   }).catch(error => {
     console.error('Error while generating a Custom Auth token for UID:', uid,
