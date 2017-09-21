@@ -19,18 +19,90 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Button from 'material-ui/Button';
+import Avatar from 'material-ui/Avatar';
+import { withStyles } from 'material-ui/styles';
+
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
-import Avatar from 'material-ui/Avatar';
-import MoreVertIcon from 'material-ui-icons/MoreVert';
-import Menu, { MenuItem } from 'material-ui/Menu';
-import SearchIcon from 'material-ui-icons/Search';
+import HomeIcon from 'material-ui-icons/Home';
+import PhotoIcon from 'material-ui-icons/Photo';
+import TrendingUpIcon from 'material-ui-icons/TrendingUp';
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import Tabs, { Tab } from 'material-ui/Tabs';
+import Drawer from 'material-ui/Drawer';
+import Divider from 'material-ui/Divider';
+import SearchBar from './SearchBar';
 import { compose } from 'redux';
 import { firebaseConnect } from 'react-redux-firebase';
+import DropdownMenu from './MoreMenu';
+import UserStatus from './UserStatus'
 import './app.global.css';
+import { lightBlue, common } from 'material-ui/colors';
+
+
+const styles = {
+  appBar: {
+    backgroundColor: lightBlue['700']
+  },
+  sideBarButton: {
+    color: common.white
+  },
+  spacer: {
+    flexGrow: '1'
+  },
+  toolBar: {
+    margin: 'auto',
+    maxWidth: '1024px',
+    padding: '10px 20px',
+    width: '100%',
+    justifyContent: 'space-between',
+    minHeight: '100px'
+  },
+  subToolBar: {
+    padding: '0',
+    minHeight: '48px'
+  },
+  subAppBar: {
+    backgroundColor: lightBlue['600']
+  },
+  logo: {
+    display: 'flex',
+    color: common.white,
+    textDecoration: 'none',
+    fontSize: '34px',
+    fontFamily: '"Amaranth", sans-serif'
+  },
+  logoIcon: {
+    margin: '5px 7px 0 0',
+    width: '32px',
+    height: '32px'
+  },
+  takePicButton: {
+    position: 'fixed',
+    bottom: '10px',
+    right: '10px'
+  },
+  uploadPicButton: {
+    position: 'absolute',
+    right: '20px',
+    bottom: '-25px'
+  },
+  mediaCapture: {
+    display: 'none'
+  },
+  tabWrapper: {
+    flexDirection: 'row',
+    color: common.white
+  },
+  tabLabel: {
+    padding: '0 8px'
+  },
+  tabRoot: {
+    height: '48px'
+  }
+};
 
 /**
  * Entry point to the FriendlyPix app.
@@ -55,164 +127,97 @@ class FriendlyPixLayout extends React.Component {
     firebaseCustomAuthToken: string | void,
     firebase: {
       logout: Function
-    }
+    },
+    classes: Object
   };
 
   state = {
-    anchorEl: null,
-    open: false,
+    navigationIndex: 0
   };
-
-  handleClick(event) {
-    this.setState({ open: true, anchorEl: event.currentTarget });
-  }
-
-  handleRequestClose() {
-    this.setState({ open: false });
-  }
 
   /**
    * @inheritDoc
    */
   render() {
+    const classes = this.props.classes;
     return (
       <div>
-        {/* Header section containing logo and menu */}
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton color="contrast" aria-label="Menu">
+        {/* Header section containing logo, menus... */}
+        <AppBar position="static" className={classes.appBar}>
+          <Toolbar className={classes.toolBar}>
+            {/* SideBar button */}
+            <IconButton
+              aria-label="Menu"
+              className={classes.sideBarButton}
+              onClick={() => this.setState({drawerOpen: true})}>
               <MenuIcon/>
             </IconButton>
 
             {/* Logo */}
-            <Link to="/feed">
-              <i className="material-icons">photo</i>
-              <Typography type="title" color="inherit">Friendly Pix</Typography>
+            <Link to="/recent" className={classes.logo}>
+              <PhotoIcon className={classes.logoIcon}/> Friendly Pix
             </Link>
 
-
-            <div >
-              <div >
-                <SearchIcon />
-              </div>
-              <input id="docsearch-input" />
-            </div>
-
-
-            <Button color="contrast">Sign out</Button>
-            <Avatar alt="Nicola Garnier" src="https://lh3.googleusercontent.com/-jgzSIY9hRSw/AAAAAAAAAAI/AAAAAAAAImQ/pT-EciMF54I/photo.jpg"/>
-            <Button color="contrast">Nicolas Garnier</Button>
-
-            <div>
-              <IconButton
-                aria-label="More"
-                aria-owns={this.state.open ? 'long-menu' : null}
-                aria-haspopup="true"
-                onClick={e => this.handleClick(e)}>
-                <MoreVertIcon />
-              </IconButton>
-              <Menu
-                id="long-menu"
-                open={this.state.open}
-                anchorEl={this.state.anchorEl}
-                onRequestClose={() => this.handleRequestClose()}
-                PaperProps={{
-                  style: {
-                    maxHeight: 48 * 4.5,
-                    width: 200
-                  },
-                  }}>
-                <MenuItem key='XX' selected={true}>
-                  Cool
-                </MenuItem>
-                <MenuItem key='XXX'>
-                  Cool2
-                </MenuItem>
-              </Menu>
-            </div>
-          </Toolbar>
-        </AppBar>
-
-
-        <header className="fp-header mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
-          <div className="mdl-layout__header-row fp-titlebar">
-
+            <div className={classes.spacer}/>
 
             {/* Search bar */}
-            <div className="fp-searchcontainer mdl-textfield mdl-js-textfield mdl-textfield--expandable">
-              <button><i className="material-icons">search</i></button>
-              <label className="mdl-button mdl-js-button mdl-button--icon" htmlFor="searchQuery">
-
-              </label>
-              <div className="mdl-textfield__expandable-holder">
-                <input className="mdl-textfield__input" type="text" id="searchQuery">
-                </input>
-                  <label className="mdl-textfield__label" htmlFor="searchQuery">Enter your query...</label>
-              </div>
-              <div id="fp-searchResults" className="mdl-card mdl-shadow--2dp"></div>
-            </div>
+            <SearchBar/>
 
             {/* Signed-in User Info */}
-            <div className="mdl-cell--hide-phone">
-              <Link to="/"><button className="fp-sign-in-button fp-signed-out-only mdl-button mdl-js-button mdl-js-ripple-effect"><i className="material-icons">account_circle</i> Sign in</button></Link>
-              <div className="fp-signed-in-user-container mdl-cell--hide-phone fp-signed-in-only">
-                <a className="fp-usernamelink mdl-button mdl-js-button">
-                  <div className="fp-avatar"></div>
-                  <div className="fp-username mdl-color-text--white"></div>
-                </a>
-              </div>
-            </div>
+            <UserStatus/>
 
             {/* Drop Down Menu */}
-            <button className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-cell--hide-phone" id="fp-menu">
-              <i className="material-icons">more_vert</i>
-            </button>
-            <ul className="fp-menu-list mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" htmlFor="fp-menu">
-              <Link to="/about">
-                <li className="mdl-menu__item"><i className="material-icons">perm_contact_calendar</i> About - Help - Contact</li>
-              </Link>
-              <li className="fp-sign-out mdl-menu__item fp-signed-in-only"><i className="material-icons">exit_to_app</i> Sign out</li>
-            </ul>
-          </div>
+            <DropdownMenu/>
+          </Toolbar>
 
-          {/* Navigation Bar */}
-          <div className="fp-tab mdl-layout__header-row mdl-cell--hide-phone mdl-color--light-blue-600">
-            <div className="mdl-tab">
-              <Link to="/" id="fp-menu-home" className="mdl-layout__tab fp-signed-in-only is-active mdl-button mdl-js-button mdl-js-ripple-effect"><i className="material-icons">home</i> Home</Link>
-              <Link to="/feed" id="fp-menu-feed" className="mdl-layout__tab mdl-button mdl-js-button mdl-js-ripple-effect"><i className="material-icons">trending_up</i> Feed</Link>
-              <input id="fp-mediacapture" type="file" accept="image/*;capture=camera"/>
-              <button className="fp-signed-in-only mdl-button mdl-js-button mdl-button--fab mdl-cell--hide-tablet mdl-color--amber-400 mdl-shadow--4dp mdl-js-ripple-effect" id="add">
+          {/* Navigation bar - TODO: Make this redux-Router-aware */}
+          <div className={classes.subAppBar}>
+            <Toolbar className={classes.toolBar + ' ' + classes.subToolBar}>
+              <Tabs
+                value={this.state.navigationIndex}
+                onChange={(event, value) => this.setState({navigationIndex: value})}>
+                <Tab icon={<HomeIcon/>} label="HOME" classes={{root: classes.tabRoot, wrapper: classes.tabWrapper, labelContainer: classes.tabLabel}}/>
+                <Tab icon={<TrendingUpIcon/>} label="RECENT" classes={{root: classes.tabRoot, wrapper: classes.tabWrapper, labelContainer: classes.tabLabel}}/>
+              </Tabs>
+
+              {/* Floating Take Picture Button */}
+              <input type="file" accept="image/*;capture=camera" className={classes.mediaCapture}/>
+              <Button fab color="accent" aria-label="upload-file" className={classes.uploadPicButton}>
                 <i className="material-icons">file_upload</i>
-              </button>
-            </div>
+              </Button>
+
+              {/* Floating Take Picture Button */}
+              <Button fab color="accent" aria-label="take-picture" className={classes.takePicButton}>
+                <i className="material-icons">photo_camera</i>
+              </Button>
+            </Toolbar>
           </div>
-          <button className="fp-signed-in-only mdl-cell--hide-desktop mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-color--amber-400 mdl-shadow--4dp" id="add-floating">
-            <i className="material-icons">photo_camera</i>
-          </button>
-        </header>
+        </AppBar>
 
         {/* Drawer menu */}
-        <div className="mdl-cell--hide-desktop mdl-cell--hide-tablet mdl-layout__drawer">
-          <Link to="/" className="fp-signed-out-only"><button className="fp-sign-in-button mdl-button mdl-js-button mdl-js-ripple-effect"><i className="material-icons">account_circle</i> Sign in</button></Link>
-          <div className="fp-signed-in-user-container mdl-color--light-blue-700 fp-signed-in-only">
-            <a className="fp-usernamelink">
-              <div className="fp-avatar"></div>
-              <div className="fp-username mdl-color-text--white"></div>
-            </a>
-          </div>
-          <nav className="mdl-navigation">
-            <a className="mdl-navigation__link is-active fp-signed-in-only" href="/"><i className="material-icons">home</i> Home</a>
-            <a className="mdl-navigation__link" href="/feed"><i className="material-icons">trending_up</i> Feed</a>
-            <hr />
-            <a className="mdl-navigation__link" href="/about"><i className="material-icons">perm_contact_calendar</i> About - Help - Contact</a>
-            <hr className="fp-signed-in-only"/>
-            <a className="fp-sign-out mdl-navigation__link fp-signed-in-only"><i className="material-icons">exit_to_app</i> Sign Out</a>
-          </nav>
-        </div>
+        <Drawer open={this.state.drawerOpen} onRequestClose={() => this.setState({drawerOpen: false})}>
+          <List>
+            <Link to="/about">
+              <ListItem button>
+                <Avatar>
+                  <i className="material-icons">perm_contact_calendar</i>
+                </Avatar>
+                <ListItemText primary="About - Help - Contact"/>
+              </ListItem>
+            </Link>
+            <Divider inset />
+            <ListItem button>
+              <Avatar>
+                <i className="material-icons">exit_to_app</i>
+              </Avatar>
+              <ListItemText primary="Sign Out"/>
+            </ListItem>
+          </List>
+        </Drawer>
 
-        <main className="mdl-layout__content mdl-color--grey-100">
+        <div>
           {this.props.children}
-        </main>
+        </div>
       </div>
     )
   }
@@ -222,24 +227,9 @@ class FriendlyPixLayout extends React.Component {
 
 const mapStateToProps = state => {
   return state;
-
-
-    // <div>
-    // <h1>TITLE</h1>
-    // <div>
-    // <Link to="/">Splash</Link> - <Link to="/recent">Recent Posts Feed</Link> - <Link to="/home">Home</Link>
-    // - <Link to="/user/1">View User 1</Link> - <Link to="/post/1">View Post 1</Link> - <Link to="/about">About</Link>
-    // - <Link to="/new">Create New</Link>
-    // <Button raised color="accent" onClick={this.props.firebase.logout}>Logout</Button>
-    // </div>
-    // <div>
-    // {this.props.children}
-    // </div>
-    // </div>
-
 };
 
 const mapDispatchToProps = (dispatch: Function, ownProps) => ({
 });
 
-export default compose(firebaseConnect(), connect(mapStateToProps, mapDispatchToProps))(FriendlyPixLayout);
+export default compose(withStyles(styles), firebaseConnect(), connect(mapStateToProps, mapDispatchToProps))(FriendlyPixLayout);

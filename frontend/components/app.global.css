@@ -16,8 +16,6 @@
 
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
-}
-a {
-  text-decoration: underline;
-  color: #039BE5;
+  padding:0;
+  margin:0;
 }
