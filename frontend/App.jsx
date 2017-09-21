@@ -42,7 +42,7 @@ import preset from 'jss-preset-default';
 // Theme.
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import createGenerateClassName from 'material-ui/styles/createGenerateClassName';
-import { lightBlue, orange } from 'material-ui/colors';
+import { lightBlue, amber } from 'material-ui/colors';
 
 // Other.
 import { canUseDOM } from 'exenv';
@@ -69,7 +69,7 @@ export class App extends React.Component {
     this.theme = createMuiTheme({
       palette: {
         primary: lightBlue,
-        accent: orange,
+        secondary: amber,
         type: 'light',
       },
     });
