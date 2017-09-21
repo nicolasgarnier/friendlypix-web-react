@@ -15,48 +15,110 @@
  */
 // @flow
 
+// React core.
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import Routes from './Routes';
-import { createStore, compose, combineReducers, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-import { canUseDOM } from 'exenv';
-import { createBrowserHistory } from 'history';
-import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
-import * as reducers from './reducers';
+
+// Firebase.
 import firebase from 'firebase/app';
 import 'firebase/auth';
+
+// Redux.
+import { Provider } from 'react-redux';
+import { createStore, compose, combineReducers, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 import { reactReduxFirebase, getFirebase, firebaseStateReducer } from 'react-redux-firebase';
-import { whenAuthReady, copyIdTokenToCookie } from './firebaseTools';
+
+// Router.
+import { createBrowserHistory } from 'history';
+import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
+
+// JSS.
+import { SheetsRegistry } from 'react-jss/lib/jss';
+import JssProvider from 'react-jss/lib/JssProvider';
+import { create } from 'jss';
+import preset from 'jss-preset-default';
+
+// Theme.
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import createGenerateClassName from 'material-ui/styles/createGenerateClassName';
+import { lightBlue, orange } from 'material-ui/colors';
+
+// Other.
+import { canUseDOM } from 'exenv';
+
+// Local.
+import { whenAuthReady, keepIdTokenInCookie } from './firebaseTools';
+import * as reducers from './reducers';
+import Routes from './Routes';
 
 /**
  * Loads the App in a server context.
+ *
+ * This takes care of setting up JSS, the Theme, Redux and the Router.
  */
 export class App extends React.Component {
+
+  /**
+   * @inheritDoc
+   */
+  constructor(props) {
+    super(props);
+
+    // Create a theme instance.
+    this.theme = createMuiTheme({
+      palette: {
+        primary: lightBlue,
+        accent: orange,
+        type: 'light',
+      },
+    });
+
+    // Configure JSS
+    this.jss = create(preset());
+    this.jss.options.createGenerateClassName = createGenerateClassName;
+  }
+
   /**
    * Properties types.
    */
   props: {
     store: Object,
-    history: Object
+    history: Object,
+    registry: Object
   };
+
+  /**
+   * @inheritDoc
+   */
+  componentDidMount() {
+    // Remove the server-side injected CSS.
+    const jssStyles = document.getElementById('jss-server-side');
+    if (jssStyles && jssStyles.parentNode) {
+      jssStyles.parentNode.removeChild(jssStyles);
+    }
+  }
 
   /**
    * @inheritDoc
    */
   render() {
     return (
-      <Provider store={this.props.store}>
-        <ConnectedRouter history={this.props.history}>
-          <Routes/>
-        </ConnectedRouter>
-      </Provider>
+      <JssProvider registry={this.props.registry} jss={this.jss}>
+        <MuiThemeProvider theme={this.theme} sheetsManager={new Map()}>
+          <Provider store={this.props.store}>
+            <ConnectedRouter history={this.props.history}>
+              <Routes/>
+            </ConnectedRouter>
+          </Provider>
+        </MuiThemeProvider>
+      </JssProvider>
     );
   }
 }
+
 /**
- * Create the redux store given a history manager.
+ * Create a redux store.
  *
  * @param {Object} history - The History manager to use.
  * @param {Object} firebaseApp - The Firebase App instance to use.
@@ -80,6 +142,15 @@ export function makeStore(history, firebaseApp, initialState = {}) {
   );
 }
 
+/**
+ * Create a Jss Registry.
+ *
+ * @return {Object} - The Jss Registry.
+ */
+export function makeRegistry() {
+  return new SheetsRegistry();
+}
+
 // On the client, display the app.
 if (canUseDOM) {
   // Get the Firebase config from the auto generated file.
@@ -88,13 +159,16 @@ if (canUseDOM) {
   // Instantiate a Firebase app.
   const firebaseApp = firebase.initializeApp(firebaseConfig);
 
-  // Make sure we copy the ID Token to the __session cookie.
-  copyIdTokenToCookie(firebaseApp, '__session');
+  // Keep the Firebase ID Token and the __session cookie in sync.
+  keepIdTokenInCookie(firebaseApp, '__session');
 
+  const registry = makeRegistry();
   const history = createBrowserHistory();
   const store = makeStore(history, firebaseApp, window.__REDUX_STATE__);
+
+  // When Firebase Auth is ready we'll display the app.
   whenAuthReady(store).then(() => {
     // Render the app.
-    ReactDOM.render(<App store={store} history={history}/>, document.getElementById('app'));
+    ReactDOM.render(<App registry={registry} store={store} history={history}/>, document.getElementById('app'));
   });
 }

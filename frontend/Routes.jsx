@@ -18,7 +18,7 @@
 import React from 'react';
 import { Route } from 'react-router';
 import { push } from 'react-router-redux'
-import Layout from './components/Layout';
+import FriendlyPixLayout from './components/Layout';
 import { connect } from 'react-redux';
 import SplashPage from './components/SplashPage';
 import HomeFeed from './components/HomeFeed';
@@ -80,7 +80,7 @@ class Routes extends React.Component {
   render() {
     // Let's wait for the Firebase auth to be ready before rendering the UI.
     return (
-      <Layout>
+      <FriendlyPixLayout>
         <Route exact path="/" component={SplashPage}/>
         <Route path="/home" component={HomeFeed}/>
         <Route path="/recent" component={RecentPostsFeed}/>
@@ -88,7 +88,7 @@ class Routes extends React.Component {
         <Route path="/post/:id" component={SinglePost}/>
         <Route path="/about" component={About}/>
         <Route path="/new" component={NewPost}/>
-      </Layout>
+      </FriendlyPixLayout>
     )
   }
 }

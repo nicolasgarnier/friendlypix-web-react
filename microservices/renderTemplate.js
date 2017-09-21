@@ -58,15 +58,19 @@ router.get('*', (req, res) => {
     // Set the new URL.
     history.replace(req.url);
     const store = app.makeStore(history, firebaseApp);
+    const registry = app.makeRegistry();
     // Wait for auth to be ready.
     firebaseTools.whenAuthReady(store).then(() => {
       // Render the App.
       const body = ReactDOMServer.renderToString(
-        React.createElement(app.App, {store: store, history: history})
+        React.createElement(app.App, {registry:registry, store: store, history: history})
       );
 
       // Get the state of the redux store.
       const initialState = store.getState();
+
+      // Grab the CSS from our sheetsRegistry.
+      const css = registry.toString()
 
       // Check if there has been a redirect.
       const lastUrl = initialState.router.location.pathname;
@@ -77,7 +81,7 @@ router.get('*', (req, res) => {
       } else {
         res.set('Cache-Control', 'public, max-age=60, s-maxage=180'); // TODO: make this change dependent on each URL. with a map maybe??
         // If there was no redirect we send the rendered app as well as the redux state.
-        res.send(template({body, initialState}));
+        res.send(template({body, initialState, css}));
       }
     });
   }).catch(error => {
