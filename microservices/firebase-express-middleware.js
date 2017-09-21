@@ -177,7 +177,6 @@ function getIdTokenFromRequestHeader(req) {
   }
 }
 
-
 /**
  * Returns a Promise with the Firebase ID Token if found in a cookie of the given name.
  *
