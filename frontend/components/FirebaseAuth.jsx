@@ -10,13 +10,12 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for t`he specific language governing permissions and
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 // @flow
 
 import React from 'react';
-import 'firebaseui/dist/firebaseui.css'; // import globally.
 
 // Global ID for the element.
 const ELEMENT_ID = 'firebaseui_container';
@@ -44,6 +43,8 @@ export default class FirebaseAuth extends React.Component {
    * @inheritDoc
    */
   componentDidMount() {
+    require('firebaseui/dist/firebaseui.css'); // import globally and only on the client.
+
     // Firebase UI only works on the Client. So we're loading in a `componentDidMount`.
     const firebaseui = require('firebaseui');
     this.firebaseUiWidget = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(this.firebaseAuth);
