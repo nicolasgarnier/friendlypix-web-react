@@ -16,9 +16,10 @@
 // @flow
 
 import React from 'react';
-import { Route, Redirect, Switch } from 'react-router';
+import { Route, Switch } from 'react-router';
 import FriendlyPixLayout from './components/Layout';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 import SplashPage from './components/SplashPage';
 import HomeFeed from './components/HomeFeed';
 import RecentPostsFeed from './components/RecentPostsFeed';
@@ -31,42 +32,86 @@ import FourOhFour from './components/FourOhFour';
 /**
  * All the routes.
  */
-class Routes extends React.Component {
+class AuthRedirect extends React.Component {
 
   /**
    * Properties types.
    */
   props: {
-    firebaseState: {
-      auth: {
-        isEmpty: boolean
-      }
-    },
-    router: {
-      location: {
-        pathname: string
-      }
-    },
-    redirectHome: Function
+    isAuth?: boolean,
+    from: string,
+    to?: string | Object,
+    push?: boolean,
+    ifAuth?: boolean,
+    exact?: boolean,
+    redirect: Function
   };
 
   /**
    * @inheritDoc
    */
-  render() {
+  componentWillReceiveProps(props) {
+    this.onRouting(props);
+  }
 
-    if (this.props.router.location.pathname === '/'
-        && !this.props.firebaseState.auth.isEmpty) {
-      return (<Redirect from="/" to="/home"/>);
+  /**
+   * @inheritDoc
+   */
+  componentWillMount() {
+    this.onRouting(this.props);
+  }
+
+  /**
+   * Executing every time new routing should occur.
+   *
+   * @param {Object} props
+   */
+  onRouting(props) {
+    if (props.isAuth && props.ifAuth
+        || !props.isAuth && !props.ifAuth) {
+      this.props.redirect(props.to);
     }
+  }
 
-    // Let's wait for the Firebase auth to be ready before rendering the UI.
+  /**
+   * @inheritDoc
+   */
+  render() {
+    return null;
+  }
+}
+
+const mapStateToProps = state => {
+  return {isAuth: !state.firebaseState.auth.isEmpty};
+};
+
+const mapDispatchToProps = (dispatch: Function, ownProps) => ({
+  redirect(to) {
+    dispatch(push(to));
+  }
+});
+
+
+AuthRedirect = connect(mapStateToProps, mapDispatchToProps)(AuthRedirect);
+
+
+/**
+ * All the routes.
+ */
+class Routes extends React.Component {
+
+  /**
+   * @inheritDoc
+   */
+  render() {
     return (
       <Switch>
+        <AuthRedirect exact ifAuth={true} from="/" to="/home"/>
         <Route exact path="/" component={SplashPage}/>
         <Route>
           <FriendlyPixLayout>
             <Switch>
+              <AuthRedirect ifAuth={false} from="/home" to="/"/>
               <Route path="/home" component={HomeFeed}/>
               <Route path="/recent" component={RecentPostsFeed}/>
               <Route path="/user/:id" component={UserProfile}/>
@@ -82,8 +127,4 @@ class Routes extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  return state;
-};
-
-export default connect(mapStateToProps)(Routes);
+export default connect()(Routes);
