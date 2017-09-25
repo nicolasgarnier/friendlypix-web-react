@@ -26,18 +26,16 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
-import HomeIcon from 'material-ui-icons/Home';
 import PhotoIcon from 'material-ui-icons/Photo';
-import TrendingUpIcon from 'material-ui-icons/TrendingUp';
 import List, { ListItem, ListItemText } from 'material-ui/List';
-import Tabs, { Tab } from 'material-ui/Tabs';
 import Drawer from 'material-ui/Drawer';
 import Divider from 'material-ui/Divider';
 import SearchBar from './SearchBar';
 import { compose } from 'redux';
 import { firebaseConnect } from 'react-redux-firebase';
 import DropdownMenu from './MoreMenu';
-import UserStatus from './UserStatus'
+import NavigationBar from './NavigationBar';
+import UserStatus from './UserStatus';
 import './app.global.css';
 import { lightBlue, common } from 'material-ui/colors';
 
@@ -91,16 +89,6 @@ const styles = {
   },
   mediaCapture: {
     display: 'none'
-  },
-  tabWrapper: {
-    flexDirection: 'row',
-    color: common.white
-  },
-  tabLabel: {
-    padding: '0 8px'
-  },
-  tabRoot: {
-    height: '48px'
   }
 };
 
@@ -132,7 +120,7 @@ class FriendlyPixLayout extends React.Component {
   };
 
   state = {
-    navigationIndex: 0
+    drawerOpen: false
   };
 
   /**
@@ -173,12 +161,7 @@ class FriendlyPixLayout extends React.Component {
           {/* Navigation bar - TODO: Make this redux-Router-aware */}
           <div className={classes.subAppBar}>
             <Toolbar className={classes.toolBar + ' ' + classes.subToolBar}>
-              <Tabs
-                value={this.state.navigationIndex}
-                onChange={(event, value) => this.setState({navigationIndex: value})}>
-                <Tab icon={<HomeIcon/>} label="HOME" classes={{root: classes.tabRoot, wrapper: classes.tabWrapper, labelContainer: classes.tabLabel}}/>
-                <Tab icon={<TrendingUpIcon/>} label="RECENT" classes={{root: classes.tabRoot, wrapper: classes.tabWrapper, labelContainer: classes.tabLabel}}/>
-              </Tabs>
+              <NavigationBar/>
 
               {/* Floating Take Picture Button */}
               <input type="file" accept="image/*;capture=camera" className={classes.mediaCapture}/>
@@ -223,13 +206,8 @@ class FriendlyPixLayout extends React.Component {
   }
 }
 
-
-
 const mapStateToProps = state => {
   return state;
 };
 
-const mapDispatchToProps = (dispatch: Function, ownProps) => ({
-});
-
-export default compose(withStyles(styles), firebaseConnect(), connect(mapStateToProps, mapDispatchToProps))(FriendlyPixLayout);
+export default compose(withStyles(styles), firebaseConnect(), connect(mapStateToProps))(FriendlyPixLayout);
