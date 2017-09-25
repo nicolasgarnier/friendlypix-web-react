@@ -17,7 +17,7 @@
 
 import React from 'react';
 import { Route } from 'react-router';
-import { push } from 'react-router-redux'
+import { push } from 'react-router-redux';
 import FriendlyPixLayout from './components/Layout';
 import { connect } from 'react-redux';
 import SplashPage from './components/SplashPage';
