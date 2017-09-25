@@ -8,10 +8,9 @@
     }]
   ],
   "plugins": [
-    "babel-plugin-syntax-dynamic-import",
-    "babel-plugin-dynamic-import-webpack",
-    "babel-plugin-transform-class-properties",
-    "babel-plugin-transform-object-rest-spread",
-    ["babel-plugin-css-modules-transform", {"generateScopedName": "[name]__[local]___[hash:base64:5]"}]
+    "transform-decorators",
+    "transform-class-properties",
+    "transform-object-rest-spread",
+    ["css-modules-transform", {"generateScopedName": "[name]__[local]___[hash:base64:5]"}]
   ]
 }
