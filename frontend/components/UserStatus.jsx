@@ -63,11 +63,6 @@ class UserStatus extends React.Component {
     classes: Object
   };
 
-  state = {
-    anchorEl: null,
-    open: false,
-  };
-
   /**
    * @inheritDoc
    */

@@ -42,6 +42,8 @@ const firebaseAdminApp = admin.initializeApp({
 }, '__service_account');
 
 
+const cacheControlHeaderValues = {};
+
 // This Express middleware will check ig there is a Firebase ID token and inject
 router.use(firebaseMiddleware.auth({
   checkCookie: true,
@@ -63,14 +65,14 @@ router.get('*', (req, res) => {
     firebaseTools.whenAuthReady(store).then(() => {
       // Render the App.
       const body = ReactDOMServer.renderToString(
-        React.createElement(app.App, {registry:registry, store: store, history: history})
+        React.createElement(app.App, {registry: registry, store: store, history: history})
       );
 
       // Get the state of the redux store.
       const initialState = store.getState();
 
       // Grab the CSS from our sheetsRegistry.
-      const css = registry.toString()
+      const css = registry.toString();
 
       // Check if there has been a redirect.
       const lastUrl = initialState.router.location.pathname;
@@ -79,9 +81,9 @@ router.get('*', (req, res) => {
         console.log('Server side redirect to', lastUrl);
         res.redirect(lastUrl);
       } else {
-        res.set('Cache-Control', 'public, max-age=60, s-maxage=180'); // TODO: make this change dependent on each URL. with a map maybe??
+        // res.set('Cache-Control', 'public, max-age=60, s-maxage=180'); // TODO: make this change dependent on each URL. with a map maybe??
         // If there was no redirect we send the rendered app as well as the redux state.
-        res.send(template({body, initialState, css}));
+        res.send(template({body, initialState, css, node_env: process.env.NODE_ENV}));
       }
     });
   }).catch(error => {

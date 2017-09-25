@@ -113,7 +113,7 @@ const DEFAULT_CONFIG = {
  *     Compute Engine, Firebase Functions...) and does not allow generating Custom auth tokens.
  * @return {Object} - The configured Firebase Auth Express Middleware.
  */
-export function auth(config) {
+exports.auth = config => {
   if (!config) {
     config = {};
   }
