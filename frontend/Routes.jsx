@@ -16,8 +16,7 @@
 // @flow
 
 import React from 'react';
-import { Route } from 'react-router';
-import { push } from 'react-router-redux';
+import { Route, Redirect, Switch } from 'react-router';
 import FriendlyPixLayout from './components/Layout';
 import { connect } from 'react-redux';
 import SplashPage from './components/SplashPage';
@@ -27,6 +26,7 @@ import SinglePost from './components/SinglePost';
 import About from './components/About';
 import NewPost from './components/NewPost';
 import UserProfile from './components/UserProfile';
+import FourOhFour from './components/FourOhFour';
 
 /**
  * All the routes.
@@ -53,42 +53,31 @@ class Routes extends React.Component {
   /**
    * @inheritDoc
    */
-  componentWillReceiveProps(nextProps) {
-    this.onRouting(nextProps.router.location.pathname, nextProps);
-  }
-
-  /**
-   * @inheritDoc
-   */
-  componentWillMount() {
-    this.onRouting(this.props.router.location.pathname, this.props);
-  }
-
-  /**
-   * @inheritDoc
-   */
-  onRouting(destinationPath, props) {
-    if (destinationPath === '/'
-        && !props.firebaseState.auth.isEmpty) {
-      props.redirectHome();
-    }
-  }
-
-  /**
-   * @inheritDoc
-   */
   render() {
+
+    if (this.props.router.location.pathname === '/'
+        && !this.props.firebaseState.auth.isEmpty) {
+      return (<Redirect from="/" to="/home"/>);
+    }
+
     // Let's wait for the Firebase auth to be ready before rendering the UI.
     return (
-      <FriendlyPixLayout>
+      <Switch>
         <Route exact path="/" component={SplashPage}/>
-        <Route path="/home" component={HomeFeed}/>
-        <Route path="/recent" component={RecentPostsFeed}/>
-        <Route path="/user/:id" component={UserProfile}/>
-        <Route path="/post/:id" component={SinglePost}/>
-        <Route path="/about" component={About}/>
-        <Route path="/new" component={NewPost}/>
-      </FriendlyPixLayout>
+        <Route>
+          <FriendlyPixLayout>
+            <Switch>
+              <Route path="/home" component={HomeFeed}/>
+              <Route path="/recent" component={RecentPostsFeed}/>
+              <Route path="/user/:id" component={UserProfile}/>
+              <Route path="/post/:id" component={SinglePost}/>
+              <Route path="/about" component={About}/>
+              <Route path="/new" component={NewPost}/>
+              <Route component={FourOhFour}/>
+            </Switch>
+          </FriendlyPixLayout>
+        </Route>
+      </Switch>
     )
   }
 }
@@ -97,10 +86,4 @@ const mapStateToProps = state => {
   return state;
 };
 
-const mapDispatchToProps = (dispatch: Function, ownProps) => ({
-  redirectHome() {
-    dispatch(push('/home'));
-  }
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Routes);
+export default connect(mapStateToProps)(Routes);
