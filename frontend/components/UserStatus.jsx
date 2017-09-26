@@ -25,16 +25,21 @@ import { compose } from 'redux';
 import { common } from 'material-ui/colors';
 
 
-const styles = {
+const styles = theme => ({
   root: {
     display: 'flex',
-    textDecoration: 'none'
+    textDecoration: 'none',
+    whiteSpace: 'nowrap'
   },
   avatar: {
     marginRight: '-20px',
     borderRadius: '20px',
     border: '2px white solid',
-    zIndex: 3
+    zIndex: 3,
+    [theme.breakpoints.down('md')]: {
+      width: '32px',
+      height: '32px'
+    }
   },
   button: {
     paddingLeft: '35px',
@@ -42,8 +47,9 @@ const styles = {
   },
   label: {
     color: common.white,
+    textTransform: 'none'
   }
-};
+});
 
 /**
  * Widget showing the user status.

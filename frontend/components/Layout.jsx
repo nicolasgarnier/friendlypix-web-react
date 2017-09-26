@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom';
 import Button from 'material-ui/Button';
 import Avatar from 'material-ui/Avatar';
 import { withStyles } from 'material-ui/styles';
-
+import Hidden from 'material-ui/Hidden';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
@@ -40,7 +40,7 @@ import './app.global.css';
 import { lightBlue, common } from 'material-ui/colors';
 
 
-const styles = {
+const styles = theme => ({
   appBar: {
     backgroundColor: lightBlue['700']
   },
@@ -56,7 +56,15 @@ const styles = {
     padding: '10px 20px',
     width: '100%',
     justifyContent: 'space-between',
-    minHeight: '100px'
+    boxSizing: 'border-box',
+    minHeight: '90px',
+    [theme.breakpoints.down('md')]: {
+      minHeight: '60px',
+      padding: '5px 0 5px 10px'
+    },
+    [theme.breakpoints.down('sm')]: {
+      padding: '0'
+    }
   },
   subToolBar: {
     padding: '0',
@@ -70,12 +78,22 @@ const styles = {
     color: common.white,
     textDecoration: 'none',
     fontSize: '34px',
-    fontFamily: '"Amaranth", sans-serif'
+    fontFamily: '"Amaranth", sans-serif',
+    whiteSpace: 'nowrap',
+    marginRight: '20px',
+    [theme.breakpoints.down('md')]: {
+      fontSize: '28px',
+    }
   },
   logoIcon: {
     margin: '5px 7px 0 0',
     width: '32px',
-    height: '32px'
+    height: '32px',
+    [theme.breakpoints.down('md')]: {
+      width: '26px',
+      height: '26px',
+      marginTop: '4px'
+    }
   },
   takePicButton: {
     position: 'fixed',
@@ -84,13 +102,13 @@ const styles = {
   },
   uploadPicButton: {
     position: 'absolute',
-    right: '20px',
+    right: '10px',
     bottom: '-25px'
   },
   mediaCapture: {
     display: 'none'
   }
-};
+});
 
 /**
  * Entry point to the FriendlyPix app.
@@ -134,12 +152,14 @@ class FriendlyPixLayout extends React.Component {
         <AppBar position="static" className={classes.appBar}>
           <Toolbar className={classes.toolBar}>
             {/* SideBar button */}
-            <IconButton
-              aria-label="Menu"
-              className={classes.sideBarButton}
-              onClick={() => this.setState({drawerOpen: true})}>
-              <MenuIcon/>
-            </IconButton>
+            <Hidden smUp>
+              <IconButton
+                  aria-label="Menu"
+                  className={classes.sideBarButton}
+                  onClick={() => this.setState({drawerOpen: true})}>
+                <MenuIcon/>
+              </IconButton>
+            </Hidden>
 
             {/* Logo */}
             <Link to="/recent" className={classes.logo}>
@@ -152,30 +172,40 @@ class FriendlyPixLayout extends React.Component {
             <SearchBar/>
 
             {/* Signed-in User Info */}
-            <UserStatus/>
+            <Hidden xsDown>
+              <UserStatus/>
+            </Hidden>
 
             {/* Drop Down Menu */}
-            <DropdownMenu/>
+            <Hidden xsDown>
+              <DropdownMenu/>
+            </Hidden>
           </Toolbar>
 
-          {/* Navigation bar - TODO: Make this redux-Router-aware */}
-          <div className={classes.subAppBar}>
-            <Toolbar className={classes.toolBar + ' ' + classes.subToolBar}>
-              <NavigationBar/>
+          <Hidden xsDown>
+            <div className={classes.subAppBar}>
+              <Toolbar className={classes.toolBar + ' ' + classes.subToolBar}>
+                {/* Navigation bar */}
+                <NavigationBar/>
 
-              {/* Floating Take Picture Button */}
-              <input type="file" accept="image/*;capture=camera" className={classes.mediaCapture}/>
-              <Button fab color="accent" aria-label="upload-file" className={classes.uploadPicButton}>
-                <i className="material-icons">file_upload</i>
-              </Button>
+                {/* Floating Take Picture Button */}
+                <input type="file" accept="image/*;capture=camera" className={classes.mediaCapture}/>
+                  <Button fab color="accent" aria-label="upload-file" className={classes.uploadPicButton}>
+                    <i className="material-icons">file_upload</i>
+                  </Button>
+              </Toolbar>
+            </div>
+          </Hidden>
 
-              {/* Floating Take Picture Button */}
-              <Button fab color="accent" aria-label="take-picture" className={classes.takePicButton}>
-                <i className="material-icons">photo_camera</i>
-              </Button>
-            </Toolbar>
-          </div>
+          {/* Floating Take Picture Button */}
+          <Hidden smUp>
+            <Button fab color="accent" aria-label="take-picture" className={classes.takePicButton}>
+              <i className="material-icons">photo_camera</i>
+            </Button>
+          </Hidden>
         </AppBar>
+
+
 
         {/* Drawer menu */}
         <Drawer open={this.state.drawerOpen} onRequestClose={() => this.setState({drawerOpen: false})}>

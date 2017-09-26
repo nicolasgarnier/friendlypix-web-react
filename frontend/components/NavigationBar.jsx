@@ -23,11 +23,15 @@ import TrendingUpIcon from 'material-ui-icons/TrendingUp';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import HomeIcon from 'material-ui-icons/Home';
 import { common } from 'material-ui/colors';
+import { compose } from 'redux';
 
-const styles = {
+const styles = theme => ({
   tabWrapper: {
     flexDirection: 'row',
-    color: common.white
+    color: common.white,
+    [theme.breakpoints.down('md')]: {
+      padding: '0 4px 0 12px'
+    }
   },
   tabLabel: {
     padding: '0 8px'
@@ -37,8 +41,14 @@ const styles = {
   },
   link: {
     textDecoration: 'none'
+  },
+  root: {
+    marginLeft: '-20px',
+    '@media (max-width: 1044px)': {
+      marginLeft: 0
+    }
   }
-};
+});
 
 /**
  * This is a Tab warped in a Link.
@@ -83,7 +93,11 @@ class NavigationBar extends React.Component {
    * Properties types.
    */
   props: {
-    pathname: String
+    pathname: String,
+    isSignedIn: boolean,
+    classes?: {
+      root: Object
+    }
   };
 
   /**

@@ -24,14 +24,18 @@ import { compose } from 'redux';
 import { firebaseConnect } from 'react-redux-firebase';
 import { common, lightBlue } from 'material-ui/colors';
 
-const styles = {
+const styles = theme => ({
   root: {
     display: 'block',
     color: common.white,
     backgroundColor: lightBlue['600'],
     borderRadius: '3px',
     padding: '5px 10px 5px 5px',
-    marginRight: '20px'
+    marginRight: '20px',
+    whiteSpace: 'nowrap',
+    [theme.breakpoints.down('sm')]: {
+      marginRight : '6px'
+    }
   },
   icon: {
     position: 'relative',
@@ -47,7 +51,7 @@ const styles = {
       display: 'none'
     }
   }
-};
+});
 
 /**
  * The Search Bar.
