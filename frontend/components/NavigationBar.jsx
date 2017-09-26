@@ -90,17 +90,26 @@ class NavigationBar extends React.Component {
    * @inheritDoc
    */
   render() {
+    if (this.props.isSignedIn) {
+      return (
+        <Tabs className={this.props.classes.root} value={this.props.pathname} onChange={() => {}}>
+          <LinkTab value="/home" icon={<HomeIcon/>} label="HOME"/>
+          <LinkTab value="/recent" icon={<TrendingUpIcon/>} label="RECENT"/>
+        </Tabs>
+      );
+    }
+
     return (
       <Tabs value={this.props.pathname} onChange={() => {}}>
-        <LinkTab value="/home" icon={<HomeIcon/>} label="HOME"/>
         <LinkTab value="/recent" icon={<TrendingUpIcon/>} label="RECENT"/>
       </Tabs>
-    )
+    );
   }
 }
 
-const mapStateToProps = state => {
-  return {pathname: state.router.location.pathname};
-};
+const mapStateToProps = state => ({
+  pathname: state.router.location.pathname,
+  isSignedIn: !state.firebaseState.auth.isEmpty
+});
 
-export default connect(mapStateToProps)(NavigationBar);
+export default compose(withStyles(styles), connect(mapStateToProps))(NavigationBar);
