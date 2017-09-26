@@ -16,7 +16,6 @@
 // @flow
 
 import React from 'react';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import IconButton from 'material-ui/IconButton';
 import Avatar from 'material-ui/Avatar';
@@ -28,6 +27,8 @@ import Popover from 'material-ui/Popover';
 import { compose } from 'redux';
 import { firebaseConnect } from 'react-redux-firebase';
 import { common } from 'material-ui/colors';
+import PermContactCalendarIcon from 'material-ui-icons/PermContactCalendar';
+import ExitToAppIcon from 'material-ui-icons/ExitToApp';
 
 const styles = {
   noStyleLink: {
@@ -113,7 +114,7 @@ class DropdownMenu extends React.Component {
             <Link to="/about" className={classes.noStyleLink}>
               <ListItem button>
                 <Avatar>
-                  <i className="material-icons">perm_contact_calendar</i>
+                  <PermContactCalendarIcon/>
                 </Avatar>
                 <ListItemText primary="About - Help - Contact"/>
               </ListItem>
@@ -121,7 +122,7 @@ class DropdownMenu extends React.Component {
             <Divider inset/>
             <ListItem button onClick={() => this.logout()}>
               <Avatar>
-                <i className="material-icons">exit_to_app</i>
+                <ExitToAppIcon/>
               </Avatar>
               <ListItemText primary="Sign Out"/>
             </ListItem>
@@ -132,4 +133,4 @@ class DropdownMenu extends React.Component {
   }
 }
 
-export default compose(withStyles(styles), firebaseConnect(), connect())(DropdownMenu);
+export default compose(withStyles(styles), firebaseConnect())(DropdownMenu);

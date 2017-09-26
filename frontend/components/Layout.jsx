@@ -19,7 +19,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Button from 'material-ui/Button';
-import Avatar from 'material-ui/Avatar';
+import DrawerContent from './DrawerContent';
 import { withStyles } from 'material-ui/styles';
 import Hidden from 'material-ui/Hidden';
 import AppBar from 'material-ui/AppBar';
@@ -27,9 +27,7 @@ import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 import PhotoIcon from 'material-ui-icons/Photo';
-import List, { ListItem, ListItemText } from 'material-ui/List';
 import Drawer from 'material-ui/Drawer';
-import Divider from 'material-ui/Divider';
 import SearchBar from './SearchBar';
 import { compose } from 'redux';
 import { firebaseConnect } from 'react-redux-firebase';
@@ -116,16 +114,6 @@ const styles = theme => ({
 class FriendlyPixLayout extends React.Component {
 
   /**
-   * Constructor for the FriendlyPix app.
-   *
-   * @param {Object} props - Additional object properties.
-   * @constructor
-   */
-  constructor(props) {
-    super(props);
-  }
-
-  /**
    * Properties types.
    */
   props: {
@@ -140,6 +128,13 @@ class FriendlyPixLayout extends React.Component {
   state = {
     drawerOpen: false
   };
+
+  /**
+   * Closes the Drawer.
+   */
+  closeDrawer() {
+    this.setState({drawerOpen: false})
+  }
 
   /**
    * @inheritDoc
@@ -208,24 +203,10 @@ class FriendlyPixLayout extends React.Component {
 
 
         {/* Drawer menu */}
-        <Drawer open={this.state.drawerOpen} onRequestClose={() => this.setState({drawerOpen: false})}>
-          <List>
-            <Link to="/about">
-              <ListItem button>
-                <Avatar>
-                  <i className="material-icons">perm_contact_calendar</i>
-                </Avatar>
-                <ListItemText primary="About - Help - Contact"/>
-              </ListItem>
-            </Link>
-            <Divider inset />
-            <ListItem button>
-              <Avatar>
-                <i className="material-icons">exit_to_app</i>
-              </Avatar>
-              <ListItemText primary="Sign Out"/>
-            </ListItem>
-          </List>
+        <Drawer open={this.state.drawerOpen} onRequestClose={() => this.closeDrawer()}>
+          <div role="button" onClick={() => this.closeDrawer()}>
+            <DrawerContent/>
+          </div>
         </Drawer>
 
         <div>
@@ -236,8 +217,4 @@ class FriendlyPixLayout extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  return state;
-};
-
-export default compose(withStyles(styles), firebaseConnect(), connect(mapStateToProps))(FriendlyPixLayout);
+export default compose(withStyles(styles), firebaseConnect(), connect(state => state))(FriendlyPixLayout);
