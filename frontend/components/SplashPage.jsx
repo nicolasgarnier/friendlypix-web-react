@@ -17,6 +17,7 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
+import PhotoIcon from 'material-ui-icons/Photo';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import { Link } from 'react-router-dom';
@@ -73,7 +74,7 @@ class SplashPage extends React.Component {
   render() {
     return (
       <div className={styles.container}>
-        <div className={styles.logo}><i className={styles.logoIcon + " material-icons"}>photo</i> Friendly Pix</div>
+        <div className={styles.logo}><PhotoIcon className={styles.logoIcon}/> Friendly Pix</div>
         <div className={styles.caption}>The friendliest way to share your pics</div>
         <div>
           <FirebaseAuth className={styles.firebaseUi} uiConfig={this.uiConfig} firebaseAuth={this.props.firebase.auth()}/>
