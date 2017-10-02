@@ -53,10 +53,12 @@ class Routes extends React.Component {
 
     return (
       <div>
+        {/* Redirects */}
         <Switch>
           <ConditionalRedirect if={isAuth} exact from="/" to="/home"/>
           <ConditionalRedirect if={!isAuth} exact from="/home" to="/"/>
         </Switch>
+        {/* Content */}
         <Switch>
           <Route exact path="/" component={SplashPage}/>
           <Route>
