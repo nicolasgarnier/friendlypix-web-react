@@ -18,10 +18,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PhotoIcon from 'material-ui-icons/Photo';
+import { FirebaseAuth } from 'react-firebaseui';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import { Link } from 'react-router-dom';
-import FirebaseAuth from './FirebaseAuth';
 import { firebaseConnect } from 'react-redux-firebase';
 import styles from './splash-page.css';
 import { push } from 'react-router-redux';
