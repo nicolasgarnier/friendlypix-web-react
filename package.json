@@ -46,7 +46,7 @@
     "react-jss": "^7.1.0",
     "react-promise": "~1.1.1",
     "react-redux": "5.0.5",
-    "react-redux-firebase": "^2.0.0-beta.8",
+    "react-redux-firebase": "2.0.0-beta.9",
     "react-router": "^4.1.2",
     "react-router-dom": "4.1.1",
     "react-router-redux": "^5.0.0-alpha.6",

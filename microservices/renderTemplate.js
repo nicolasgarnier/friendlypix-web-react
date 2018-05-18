@@ -26,7 +26,6 @@ const _ = require('lodash');
 const baseTemplate = fs.readFileSync(path.resolve(__dirname, './index.html'));
 const template = _.template(baseTemplate);
 const app = require('../frontend/App');
-const firebaseTools = require('../frontend/firebaseTools');
 const express = require('express');
 const router = new express.Router();
 const firebaseMiddleware = require('./firebase-express-middleware');
@@ -62,7 +61,9 @@ router.get('*', (req, res) => {
     const store = app.makeStore(history, firebaseApp);
     const registry = app.makeRegistry();
     // Wait for auth to be ready.
-    firebaseTools.whenAuthReady(store).then(() => {
+    console.log('Waiting for Auth state to be ready in Redux store');
+    store.firebaseAuthIsReady.then(() => {
+      console.log('Auth state ready in Redux store');
       // Render the App.
       const body = ReactDOMServer.renderToString(
         React.createElement(app.App, {registry: registry, store: store, history: history})
@@ -136,4 +137,4 @@ function createFirebaseAppWithSignedInUser(uid = undefined, customToken) {
   }
 
   return signInPromise.then(() => firebaseApp);
-};
+}

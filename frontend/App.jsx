@@ -48,12 +48,12 @@ import { lightBlue, amber } from 'material-ui/colors';
 import { canUseDOM } from 'exenv';
 
 // Local.
-import { whenAuthReady, keepIdTokenInCookie } from './firebaseTools';
+import { keepIdTokenInCookie } from './firebaseTools';
 import * as reducers from './reducers';
 import Routes from './Routes';
 
 /**
- * Loads the App in a server context.
+ * Loads the App.
  *
  * This takes care of setting up JSS, the Theme, Redux and the Router.
  */
@@ -127,6 +127,7 @@ export class App extends React.Component {
  */
 export function makeStore(history, firebaseApp, initialState = {}) {
   const historyMiddleware = routerMiddleware(history);
+
   return createStore(
     combineReducers({
       ...reducers,
@@ -137,9 +138,13 @@ export function makeStore(history, firebaseApp, initialState = {}) {
     compose(
       applyMiddleware(thunk.withExtraArgument(getFirebase)),
       applyMiddleware(historyMiddleware),
-      reactReduxFirebase(firebaseApp, {enableRedirectHandling: false})
-    )
-  );
+      reactReduxFirebase(firebaseApp, {
+        enableRedirectHandling: false,
+        attachAuthIsReady: true,
+        firebaseStateName: 'firebaseState',
+        authIsReady: () => Promise.resolve() // Remove when prescottprue/redux-firebase#2 is fixed.
+      })
+    ));
 }
 
 /**
@@ -151,7 +156,7 @@ export function makeRegistry() {
   return new SheetsRegistry();
 }
 
-// On the client, display the app.
+// On the client, display the app right away.
 if (canUseDOM) {
   // Get the Firebase config from the auto generated file.
   const firebaseConfig = require('./firebase-config.json').result;
@@ -166,8 +171,13 @@ if (canUseDOM) {
   const history = createBrowserHistory();
   const store = makeStore(history, firebaseApp, window.__REDUX_STATE__);
 
+  store.subscribe(() => {
+    const firebaseState = store.getState().firebaseState;
+    console.log('state: ',firebaseState.auth);
+  });
+
   // When Firebase Auth is ready we'll display the app.
-  whenAuthReady(store).then(() => {
+  store.firebaseAuthIsReady.then(() => {
     // Render the app.
     ReactDOM.render(<App registry={registry} store={store} history={history}/>, document.getElementById('app'));
   });
